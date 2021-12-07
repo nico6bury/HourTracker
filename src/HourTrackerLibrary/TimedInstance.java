@@ -108,7 +108,7 @@ public class TimedInstance {
     /**
      * 
      */
-    private TimeGrouping currentGroup = null;
+    private TimeGrouping currentGroup = TimeGrouping.getEmptyGroup();
     /**
      * 
      * @return
