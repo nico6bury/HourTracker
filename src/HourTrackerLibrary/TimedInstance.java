@@ -106,6 +106,33 @@ public class TimedInstance {
     }//end setName(name)
 
     /**
+     * 
+     */
+    private TimeGrouping currentGroup = null;
+    /**
+     * 
+     * @return
+     */
+    public TimeGrouping getCurrentGroup(){
+        return currentGroup;
+    }//end getCurrentGroup()
+    /**
+     * 
+     * @param group
+     */
+    public void setCurrentGroup(TimeGrouping group){
+        this.currentGroup = group;
+    }//end setCurrentGroup(group)
+    /**
+     * 
+     * @return
+     */
+    public String getCurrentGroupName(){
+        if(currentGroup == null) return null;
+        else return currentGroup.getName();
+    }//end getCurrentGroupName()
+
+    /**
      * Whether or not we should worry about the exact beginning
      * or end of this instance. If this is false, we just care
      * about the duration basically.
@@ -202,8 +229,8 @@ public class TimedInstance {
         return this.handleDate == other.handleDate &&
             this.handleSpecificBeginEnd == other.handleSpecificBeginEnd &&
             this.start.equals(other.start) &&
-            this.end.equals(other.end);
-            //&& this.CurrentGroup == time.CurrentGroup;
+            this.end.equals(other.end)
+            && this.currentGroup == other.currentGroup;
     }//end equals(other)
 
     // TODO: make sure to do fileIO stuff later
