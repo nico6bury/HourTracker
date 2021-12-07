@@ -146,5 +146,34 @@ public class TimeGrouping {
         return this.name;
     }//end toString()
 
-    // TODO: finish off all of the fileI/O stuff at some point
+    /**
+     * Serializes this group object as a list of strings.
+     * It is assumed that each string in the list would be its
+     * own line if it were to be written to a file.
+     * @return A serialized list of strings that represent this group
+     * and all the TimedInstance objects within it.
+     */
+    public ArrayList<String> serialize(){
+        ArrayList<String> lines = new ArrayList<String>();
+        // add the group name
+        lines.add(this.name);
+        // add all the times
+        for(TimedInstance time : times)
+            lines.add(time.serialize());
+        return lines;
+    }//end serialize()
+
+    public void deserialize(ArrayList<String> lines){
+        if(lines.size() < 1){
+            throw new IllegalArgumentException("Must include at least name.");
+        }//end if lines is obviously too small
+        // reset times
+        this.times.clear();
+        // set new values for important stuff
+        this.name = lines.get(0);
+        for(int i = 1; i < lines.size(); i++){
+            TimedInstance newTime = new TimedInstance(lines.get(i));
+            this.times.add(newTime);
+        }//end looping over lines
+    }//end deserialize(lines)
 }//end class TimeGrouping
