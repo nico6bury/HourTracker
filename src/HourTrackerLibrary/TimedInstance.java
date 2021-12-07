@@ -221,6 +221,18 @@ public class TimedInstance {
     }//end copy constructor
     
     /**
+     * Initializes this object based on a serialized string.
+     * Literally just deserialize method in constructor form.
+     * @param serial The serialized TimedInstance object to be
+     * used for conversion.
+     * @see #deserialize(String)
+     * @see #serialize()
+     */
+    public TimedInstance(String serial){
+        deserialize(serial);
+    }//end 1-arg deserialization constructor
+
+    /**
      * 
      * @param other
      * @return
@@ -233,5 +245,93 @@ public class TimedInstance {
             && this.currentGroup == other.currentGroup;
     }//end equals(other)
 
-    // TODO: make sure to do fileIO stuff later
+    /**
+     * Returns string representation of this object, respecting
+     * handleSpecificBeginEnd and handleDate in terms of formatting.
+     */
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        if(handleSpecificBeginEnd){
+            if(handleDate){
+                sb.append(start + " to " + end);
+            }//end if we should print the date
+            else{
+                sb.append(start + " to " + end);
+            }//end else we shouldn't print the date
+        }//end if we're handling specific start or end
+        else{
+            Duration localDuration = getDuration();
+            long hours = localDuration.getSeconds() / 360;
+            long minutes = localDuration.getSeconds() / 60;
+            sb.append(hours + " hours and " + minutes + " minutes");
+        }//end else we just want the duration
+        return sb.toString();
+    }//end toString()
+
+    /**
+     * Serializes this object into a string.
+     * @return A serialized string which can be used to rebuild
+     * this object with its current values.
+     */
+    public String serialize(){
+        StringBuilder sb = new StringBuilder();
+
+        // add name to string
+        sb.append("name:" + this.name + "|");
+        // add booleans to string
+        sb.append("handleSpecificBeginEnd:" +
+            this.handleSpecificBeginEnd + "|");
+        sb.append("handleDate:" + this.handleDate + "|");
+        // add start to string
+        sb.append("start:" + this.start + "|");
+        // add end to string
+        sb.append("end:" + this.end + "|");
+
+        return sb.toString();
+    }//end formatForFile()
+
+    /**
+     * Deserializes a string in order to read its contents back
+     * into this object.
+     * @param serial
+     */
+    public void deserialize(String serial){
+        String[] serialComponents = serial.split("|");
+        for(String component : serialComponents){
+            String[] componentComponents = component.split(":");
+            if(componentComponents.length == 2){
+                try{
+                    Field componentField = getClass()
+                        .getField(componentComponents[0]);
+                    if(componentField.canAccess(this)){
+                        // figure out the type and convert it accordingly
+                        if(componentField.getType() == Instant.class){
+                            Instant value = Instant
+                                .parse(componentComponents[1]);
+                            componentField.set(this, value);
+                        }//end if we're working with an instant
+                        else if(componentField.getType() == Duration.class){
+                            Duration value = Duration
+                                .parse(componentComponents[1]);
+                            componentField.set(this, value);
+                        }//end else if we're working with a duration
+                        else if(componentField.getType() == String.class){
+                            componentField.set(this, componentComponents[1]);
+                        }//end else if we're working with a string
+                        else if(componentField.getType() == boolean.class){
+                            boolean value = Boolean
+                                .parseBoolean(componentComponents[1]);
+                            componentField.set(this, value);
+                        }//end else if we're working with a boolean
+                    }//end if we can access the field in question
+                }//end trying to get the corresponding field
+                catch(NoSuchFieldException e){
+                    e.printStackTrace();
+                }//end catching noSuchFieldExceptions
+                catch(IllegalAccessException e){
+                    e.printStackTrace();
+                }//end catching illegalAccessExceptions
+            }//end if the component was parsed successfully
+        }//end looping over each component of the line
+    }//end deserialize(serial)
 }//end class TimedInstance
