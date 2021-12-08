@@ -97,7 +97,7 @@ public class TimeGrouping {
      * Initialize group with list of instances.
      * @param times The list of TimedInstance objects to add to the group.
      */
-    public TimeGrouping(ArrayList<TimedInstance> times){
+    public TimeGrouping(List<TimedInstance> times){
         for(TimedInstance time : times){
             TimedInstance newTime = new TimedInstance(time);
             newTime.setCurrentGroup(this);
@@ -120,7 +120,7 @@ public class TimeGrouping {
      * @param times The list of TimedInstance objects to add to
      * the group.
      */
-    public TimeGrouping(String name, ArrayList<TimedInstance> times){
+    public TimeGrouping(String name, List<TimedInstance> times){
         this.name = name;
         for(TimedInstance time : times){
             TimedInstance newTime = new TimedInstance(time);

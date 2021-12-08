@@ -24,19 +24,19 @@ public class TimeGroupManager {
     /**
      * All the groups of times for this object.
      */
-    private ArrayList<TimeGrouping> groups = new ArrayList<TimeGrouping>();
+    private List<TimeGrouping> groups = new ArrayList<TimeGrouping>();
     /**
      * 
      * @return
      */
-    public ArrayList<TimeGrouping> getGroups() {
+    public List<TimeGrouping> getGroups() {
         return groups;
     }//end getGroups()
     /**
      * 
      * @param groups
      */
-    public void setGroups(ArrayList<TimeGrouping> groups) {
+    public void setGroups(List<TimeGrouping> groups) {
         this.groups = groups;
     }//end setGroups(groups)
 
@@ -170,4 +170,81 @@ public class TimeGroupManager {
         }//end looping over groups in this manager
         return serial;
     }//end serialize(workingDirectory)
+
+    /**
+     * Attempts to merge groups at specified indices.
+     * @param index1 The index of first group to merge. Must be smaller
+     * than index2 and a valid index in the groups list.
+     * @param index2 The index of second group to merge. Must be higher
+     * than index1 and a valid index in the groups list.
+     * @param newName The name of the new group that will be created
+     * by merging the specified groups.
+     * @param keepOldGroups Whether or not we should keep the groups
+     * used to create a merged group or remove them.
+     * @throws ArrayIndexOutOfBoundsException Exception thrown if the
+     * index1 and index2 parameters are invalid. They must both be valid
+     * indices of the group list, and index1 must be less than index2.
+     */
+    public void mergeGroups(int index1, int index2,
+        String newName, boolean keepOldGroups){
+        // check to make sure our input isn't too bad
+        if(index1 > 0 || index1 < index2 || index1 < groups.size() ||
+            index2 > 0 || index2 < groups.size()){
+            throw new ArrayIndexOutOfBoundsException("One or both of the " +
+            "provided indices are invalid. Can't find them in groups list" +
+            " or index1 might be higher than index2.");
+        }//end if we have invalid indice(s)
+        // now we can get into the meat of things
+        List<TimedInstance> mergedTimes = new ArrayList<TimedInstance>();
+        for(TimedInstance time : groups.get(index1).getTimes()){
+            mergedTimes.add(time);
+        }//end adding all the times from first group
+        for(TimedInstance time : groups.get(index2).getTimes()){
+            mergedTimes.add(time);
+        }//end adding all the times from second group
+        TimeGrouping newGroup = new TimeGrouping(newName, mergedTimes);
+        if(!keepOldGroups){
+            // remove both the indices provided in right order
+            this.groups.remove(index2);
+            this.groups.remove(index1);
+        }//end if we should delete the old groups
+        this.groups.add(newGroup);
+    }//end mergeGroups(index1, index2, newName, keepOldgroups)
+
+    /**
+     * Attempts to merge groups at specified indices.
+     * @param group1 The first group to merge. Must both be in the 
+     * groups list and appear before group2 in that list.
+     * @param group2 The second group to merge. Must both be in the
+     * groups list and appear after group1 in that list.
+     * @param newName The name of the new group that will be created
+     * by merging the specified groups.
+     * @param keepOldGroups Whether or not we should keep the groups
+     * used to create a merged group or remove them.
+     * @throws IllegalArgumentException This exception is thrown
+     * either if we can't find one or both of the groups given, or
+     * if group2 appears before group1 in the groups list.
+     */
+    public void mergeGroups(TimeGrouping group1, TimeGrouping group2,
+        String newName, boolean keepOldGroups){
+        // check to make sure our input is correct
+        if(!groups.contains(group1) || !groups.contains(group2)){
+            throw new IllegalArgumentException("One or both of the " +
+            "specified groups do not exist. Please supply two groups " +
+            "that exist in this TimeGroupManager.");
+        }//end if the specified groups don't exist
+        // get the indices for the groups
+        int index1 = groups.indexOf(group1);
+        int index2 = groups.indexOf(group2);
+        try{
+            mergeGroups(index1, index2, newName, keepOldGroups);
+        }//end trying to use the other version of overloaded method
+        catch (ArrayIndexOutOfBoundsException e){
+            e.printStackTrace();
+            throw new IllegalArgumentException("Either we couldn't find " +
+            "one or both of the groups given, or group2 appears before " +
+            "group1. Given where things went wrong though, it\'s probably" +
+            " the latter though.");
+        }//end catching ArrayindexOutOfBoundsExceptions
+    }//end mergegroups(group1, group2, newName, keepOldGroups)
 }//end class TimeGroupManager
