@@ -1,6 +1,7 @@
 package HourTrackerLibrary;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Serves as a container for holding a bunch of TimedInstance objects
@@ -163,7 +164,7 @@ public class TimeGrouping {
         return lines;
     }//end serialize()
 
-    public void deserialize(ArrayList<String> lines){
+    public void deserialize(List<String> lines){
         if(lines.size() < 1){
             throw new IllegalArgumentException("Must include at least name.");
         }//end if lines is obviously too small

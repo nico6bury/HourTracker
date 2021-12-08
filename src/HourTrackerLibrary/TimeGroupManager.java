@@ -3,6 +3,18 @@ package HourTrackerLibrary;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
+import java.util.List;
+
+/*
+Stuff we don't have to deal with because we don't do File I/O here
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.Path;
+import java.io.IOException;
+*/
 
 /**
  * Basically serves as an interface of a bunch of TimedInstance objects
@@ -129,4 +141,33 @@ public class TimeGroupManager {
             groupTimePairs.get(time).getTimes().remove(time);
         }//end looping over each timed instance
     }//end removeTimes(indices)
+
+    /**
+     * When given a list of file paths containing information
+     * from TimeGrouping objects (one file per TimeGrouping), reads
+     * groups from each of the filepaths given.
+     * @param filepaths
+     */
+    public void deserialize(List<List<String>> fileLines){
+        for(List<String> lines : fileLines){
+            TimeGrouping nextGroup = new TimeGrouping();
+            nextGroup.deserialize(lines);
+            this.groups.add(nextGroup);
+        }//end looping over lines per file
+    }//end deserialize()
+
+    /**
+     * Serializes this object into a list of serialized groups, with
+     * each List of Strings being a separate group that should be put
+     * in a separate file.
+     * @return Returns a List of serialized groups, with each group being
+     * in the form of a List of strings.
+     */
+    public List<List<String>> serialize(){
+        List<List<String>> serial = new ArrayList<List<String>>();
+        for(TimeGrouping group : groups){
+            serial.add(group.serialize());
+        }//end looping over groups in this manager
+        return serial;
+    }//end serialize(workingDirectory)
 }//end class TimeGroupManager
