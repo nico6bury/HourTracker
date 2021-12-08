@@ -1,6 +1,7 @@
 package HourTrackerLibrary;
 
 import java.time.*;
+import java.util.List;
 
 /**
  * 
@@ -38,6 +39,30 @@ public class TimeController {
 	 */
 	public TimeController(TimeView view){
 		this.view = view;
+		// make sure we have a good file path
+		if(fileio.getStorageDirectory().equals("")){
+			// log message about no config file found
+			view.logMessage("No existing files found. Getting directory.");
+			// get a directory from the user
+			String filepath = view.getPathWithMessage("It seems you " +
+			"don\'t already have a configured directory for storing " +
+			"saved times. Please select a folder where you would like " +
+			"this application to save it\'s human-readable files for " +
+			"your use.");
+			while(!fileio.saveStorageDirectory(filepath)){
+				filepath = view.getPathWithMessage("I\'m sorry, " +
+				"but it seems that the path you gave was not a valid " +
+				"directory or something. Please try again.");
+			}//end looping while filepath is unavailable.
+		}//end if we have a default storage directory
+		else{
+			// get groups from files
+			List<TimeGrouping> groups = fileio.loadGroups();
+			// add them to the manager
+			groupManager.setGroups(groups);
+			// add log message
+			view.logMessage("Found existing files. Reading them.");
+		}//end else we have stuff stored already
 	}//end sole constructor
 
 	/**
@@ -105,7 +130,31 @@ public class TimeController {
 
 	// TODO: Add methods for archiving times or groups
 
-	// TODO: Add methods for saving state to files
+	/**
+	 * Saves all the currently loaded groups as files.
+	 * @return Returns true if the files were saved
+	 * successfully, or false if something failed.
+	 */
+	public boolean saveCurrentState(){
+		return fileio.saveConfiguration();
+	}//end saveCurrentState()
+	
+	/**
+	 * Reloads all the groups saved in files.
+	 */
+	public void reloadSavedGroups(){
+		groupManager.setGroups(fileio.loadGroups());
+	}//end reloadSavedGroups()
 
-	// TODO: Add methods for loading state from files
+	/**
+	 * Updates the directory where we save all our human-readable
+	 * files.
+	 * @param directory Path of directory where we should start saving
+	 * files.
+	 * @return Returns true if the operation succeeded or false if
+	 * something went wrong somehow.
+	 */
+	public boolean updateTimeDirectory(String directory){
+		return fileio.saveStorageDirectory(directory);
+	}//end updateTimeDirectory(directory)
 }//end class TimeController

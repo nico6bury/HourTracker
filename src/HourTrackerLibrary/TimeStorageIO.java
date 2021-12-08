@@ -74,7 +74,15 @@ public class TimeStorageIO {
 	public boolean saveStorageDirectory(String path){
 		try{
 			Path tempPath = Paths.get(path);
-			if(Files.isDirectory(tempPath)) stateStorageDirectory = tempPath;
+			if(Files.isDirectory(tempPath)){
+				// transfer all of our currently managed files to new directory
+				List<TimeGrouping> groups = loadGroups();
+				saveGroups(groups, tempPath);
+				// wipe files in previous location so as to not leave dupes
+				wipeManagedFiles();
+				// save over stateStorageDirectory to complete transfer
+				stateStorageDirectory = tempPath;				
+			}//end if new path is a directory
 			else throw new InvalidPathException(path, "Path not a directory.");
 			return true;
 		}//end trying to get a path object from parameter
@@ -191,11 +199,20 @@ public class TimeStorageIO {
 	 */
 	public void saveGroups(List<TimeGrouping> groups){
 		wipeManagedFiles();
+		saveGroups(groups, this.stateStorageDirectory);
+	}//end saveGroups(groups)
+
+	/**
+	 * Saves groups to a specific directory without wiping any files.
+	 * @param groups The list of gorups to save.
+	 * @param directory The directory that the groups should be saved in.
+	 */
+	protected void saveGroups(List<TimeGrouping> groups, Path directory){
 		for(TimeGrouping group : groups){
 			try{
 				// get the path that we'll use
 				Path groupFilepath = Paths.get(
-				this.stateStorageDirectory.toString(),
+				directory.toString(),
 				group.getName());
 				// write serial to file and save path in managedFiles
 				if(saveGroup(group, groupFilepath))
@@ -205,7 +222,7 @@ public class TimeStorageIO {
 				e.printStackTrace();
 			}//end catching invalid path exceptions
 		}//end looping over groups
-	}//end saveGroups(groups)
+	}//end saveGroups(groups, directory)
 
 	/**
 	 * Saves a particular group in a particular path using the
