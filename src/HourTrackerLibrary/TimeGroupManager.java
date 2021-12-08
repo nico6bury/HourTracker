@@ -5,17 +5,6 @@ import java.util.HashMap;
 import java.util.TreeSet;
 import java.util.List;
 
-/*
-Stuff we don't have to deal with because we don't do File I/O here
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.Path;
-import java.io.IOException;
-*/
-
 /**
  * Basically serves as an interface of a bunch of TimedInstance objects
  * contained in TimeGrouping objects.
@@ -86,7 +75,7 @@ public class TimeGroupManager {
      * time into.
      */
     public boolean addTime(TimedInstance time, String groupName){
-        boolean foundExistingGroup = false;
+    boolean foundExistingGroup = false;
         int foundGroupIndex = -1;
 
         for(int i = 0; i < groups.size(); i++){
@@ -186,7 +175,7 @@ public class TimeGroupManager {
      * indices of the group list, and index1 must be less than index2.
      */
     public void mergeGroups(int index1, int index2,
-        String newName, boolean keepOldGroups){
+    String newName, boolean keepOldGroups){
         // check to make sure our input isn't too bad
         if(index1 > 0 || index1 < index2 || index1 < groups.size() ||
             index2 > 0 || index2 < groups.size()){
@@ -226,7 +215,7 @@ public class TimeGroupManager {
      * if group2 appears before group1 in the groups list.
      */
     public void mergeGroups(TimeGrouping group1, TimeGrouping group2,
-        String newName, boolean keepOldGroups){
+    String newName, boolean keepOldGroups){
         // check to make sure our input is correct
         if(!groups.contains(group1) || !groups.contains(group2)){
             throw new IllegalArgumentException("One or both of the " +

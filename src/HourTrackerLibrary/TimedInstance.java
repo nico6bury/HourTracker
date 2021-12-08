@@ -197,13 +197,28 @@ public class TimedInstance {
      * for this duration.
      */
     public TimedInstance(int hours, int minutes){
-        this.start = Instant.now();
+        this.end = Instant.now();
         this.duration = Duration.ofMinutes(minutes +
         (hours * 60));
-        this.end = this.start.plus(this.duration);
+        this.start = this.end.minus(this.duration);
         handleSpecificBeginEnd = false;
         handleDate = false;
     }//end 2-arg non-specific constructor
+
+    /**
+     * Initializes arbitrary start and end times but specifies
+     * a duration based on the one provided. Assumes you don't care
+     * about specific beginning or end, and also assumes you don't
+     * care about date.
+     * @param duration The duration to initialize the object with.
+     */
+    public TimedInstance(Duration duration){
+        this.duration = duration;
+        this.end = Instant.now();
+        this.start = this.end.minus(duration);
+        handleSpecificBeginEnd = false;
+        handleDate = false;
+    }//end 1-arg non-specific constructor
 
     /**
      * Creates this object as a copy of the supplied instance.
