@@ -2,19 +2,6 @@ package HourTrackerLibrary;
 
 import java.time.*;
 
-import javax.naming.OperationNotSupportedException;
-
-/*
-Stuff we'll drop down here in a sec
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.Path;
-import java.io.IOException;
-*/
-
 /**
  * 
  */
@@ -39,6 +26,11 @@ public class TimeController {
 	public TimeView view;
 	
 	/**
+	 * The object responsible for handling file storage stuff.
+	 */
+	protected TimeStorageIO fileio = new TimeStorageIO();
+
+	/**
 	 * Initializes this controller object with the view it should be
 	 * yeeting its method calls over to.
 	 * @param view The view that should be associated with
@@ -46,7 +38,7 @@ public class TimeController {
 	 */
 	public TimeController(TimeView view){
 		this.view = view;
-	}//end no-arg constructor
+	}//end sole constructor
 
 	/**
 	 * Method that should be called when the user clocks in.
