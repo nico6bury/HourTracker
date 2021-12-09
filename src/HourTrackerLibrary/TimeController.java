@@ -14,8 +14,7 @@ public class TimeController {
 	}//end getCurrentlyClocked()
 	
 	private TimeGroupManager groupManager = new TimeGroupManager();
-	
-	private int curGroupIndex = -1;
+	protected int curGroupIndex = -1;
 	public String getCurrentGroupName(){
 		try{
 			return groupManager.getGroups().get(curGroupIndex).getName();
@@ -24,6 +23,13 @@ public class TimeController {
 			return "Ungrouped";
 		}//end if curGroupIndex is wrong
 	}//end getCurrentGroupName()
+	public List<TimeGrouping> getGroups(){
+		List<TimeGrouping> outputGroups = new ArrayList<TimeGrouping>();
+		for(TimeGrouping group : groupManager.getGroups()){
+			outputGroups.add(group);
+		}//end adding groops in groupManager to outputGroups
+		return outputGroups;
+	}//end getGroups()
 	public TimeView view;
 	
 	/**
@@ -191,8 +197,74 @@ public class TimeController {
 
 	// TODO: Add methods for removing times or groups
 
-	// TODO: Add methods for editing times or groups
+	public void editGroup(int groupIndex){
+		// make sure indices are valid and get right index from store
+		List<TimeGrouping> groups = groupManager.getGroups();
+		if(groupIndex >= groups.size() || groupIndex < 0){
+			throw new ArrayIndexOutOfBoundsException(
+				"The value given for groupIndex, " + groupIndex +
+				", is out of bounds.");
+		}//end if groupIndex is invalid
+		TimeGrouping groupToEdit = groups.get(groupIndex);
+		// go ahead and get an edited valaue from the user
+		TimeGrouping editedGroup = view.editGroup(groupToEdit);
+		// figure out what the user wanted us to do
+		if(editedGroup != null){
+			// update our temporary store of groups
+			groups.set(groupIndex, editedGroup);
+			// set our local store into the groupManager
+			groupManager.setGroups(groups);
+			// display a log message
+			view.logMessage(editedGroup.getName() + " group has been " +
+			"successfully edited.");
+		}//end if the user actually did edit the group
+		else{
+			view.logMessage("Group Edit Cancelled.");
+		}//end else user cancelled group editting
+	}//end editGroup(groupindex)
+	
+	/**
+	 * Edits an instance. Includes call to view to get edited
+	 * instance value.
+	 * @param groupIndex Index of group that has the instance we want
+	 * to edit.
+	 * @param instanceIndex Index of instance within group
+	 */
+	public void editInstance(int groupIndex, int instanceIndex){
+		// make sure indices are valid and get right index from store
+		List<TimeGrouping> groups = groupManager.getGroups();
+		if(groupIndex >= groups.size() || groupIndex < 0){
+			throw new ArrayIndexOutOfBoundsException(
+				"The value given for groupIndex, " + groupIndex +
+				", is out of bounds.");
+		}//end if groupIndex is invalid
+		List<TimedInstance> groupTimes = groups.get(groupIndex).getTimes();
+		if(instanceIndex >= groupTimes.size() || instanceIndex < 0){
+			throw new ArrayIndexOutOfBoundsException(
+				"The value given for instanceIndex, " + instanceIndex +
+				", is out of bounds.");
+		}//end if instanceIndex is invalid
+		TimedInstance instanceToEdit = groupTimes.get(instanceIndex);
+		// get edited value from the view
+		TimedInstance editedInstance = view.editInstance(instanceToEdit);
+		// figure out what the user wanted us to do
+		if(editedInstance != null){
+			// update our temportary store of groups
+			groupTimes.set(instanceIndex, editedInstance);
+			groups.get(groupIndex).setTimes(groupTimes);
+			// set our local store into the groupManager
+			groupManager.setGroups(groups);
+			// display log message
+			view.logMessage("Instance " + editedInstance.getName() +
+			" in the group " + groups.get(groupIndex).getName() +
+			" has been edited successfully.");
+		}//end if user did actually edit the instance
+		else{
+			view.logMessage("Instance Editing Cancelled.");
+		}//end else user didn't really want to edit instance
+	}//end editInstance(groupIndex, instanceIndex)
 
+	// TODO: Make sure that TimedInstance references totheir group get updates
 	// TODO: Add methods for archiving times or groups
 
 	/**

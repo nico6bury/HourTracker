@@ -12,19 +12,19 @@ public class TimeGrouping {
     /**
      * The times associated with this group.
      */
-    private ArrayList<TimedInstance> times = new ArrayList<TimedInstance>();
+    private List<TimedInstance> times = new ArrayList<TimedInstance>();
     /**
      * 
      * @return
      */
-    public ArrayList<TimedInstance> getTimes(){
+    public List<TimedInstance> getTimes(){
         return times;
     }//end getTimes()
     /**
      * 
      * @param times
      */
-    public void setTimes(ArrayList<TimedInstance> times){
+    public void setTimes(List<TimedInstance> times){
         this.times = times;
     }//end setTimes(times)
     

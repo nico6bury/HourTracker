@@ -9,6 +9,8 @@ public interface TimeView {
 	public String getSelectedGroupName();
 	public String getCurrentInstanceName();
 	public String getPathWithMessage(String message);
+	public TimedInstance editInstance(TimedInstance instance);
+	public TimeGrouping editGroup(TimeGrouping group);
 	public void displayMessage(String message);
 	public void logMessage(String message);
 }//end interface TimeView
