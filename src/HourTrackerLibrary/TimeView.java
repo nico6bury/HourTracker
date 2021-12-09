@@ -12,5 +12,6 @@ public interface TimeView {
 	public TimedInstance editInstance(TimedInstance instance);
 	public TimeGrouping editGroup(TimeGrouping group);
 	public void displayMessage(String message);
+	public boolean confirmationMessage(String message);
 	public void logMessage(String message);
 }//end interface TimeView

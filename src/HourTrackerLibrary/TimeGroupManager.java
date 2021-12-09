@@ -48,8 +48,8 @@ public class TimeGroupManager {
         return null;
     }//end getInstance(index)
 
-    public ArrayList<TimedInstance> getTimes(){
-        ArrayList<TimedInstance> tempTimes = new ArrayList<TimedInstance>();
+    public List<TimedInstance> getTimes(){
+        List<TimedInstance> tempTimes = new ArrayList<TimedInstance>();
         for(TimeGrouping group : groups){
             for(TimedInstance time : group.getTimes()){
                 tempTimes.add(time);
@@ -199,6 +199,8 @@ public class TimeGroupManager {
         }//end if we should delete the old groups
         this.groups.add(newGroup);
     }//end mergeGroups(index1, index2, newName, keepOldgroups)
+
+    // TODO: Make sure that merge method auto-merges groups with same name
 
     /**
      * Attempts to merge groups at specified indices.

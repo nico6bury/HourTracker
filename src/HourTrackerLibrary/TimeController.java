@@ -2,6 +2,7 @@ package HourTrackerLibrary;
 
 import java.time.*;
 import java.util.*;
+import java.lang.Math;
 
 /**
  * 
@@ -195,8 +196,160 @@ public class TimeController {
 		groupManager.addTime(prevTime, curGroupName);
 	}//end addPreviousTime(duration, handleDate)
 
-	// TODO: Add methods for removing times or groups
+	/**
+	 * Removes a specific time.
+	 * @param groupIndex The index of the group which holds the instance
+	 * to be removed.
+	 * @param instanceIndex The index of the instance within its group
+	 * to be removed.
+	 */
+	public void removeTime(int groupIndex, int instanceIndex){
+		// make sure the group index is valid
+		List<TimeGrouping> groups = groupManager.getGroups();
+		if(groupIndex >= groups.size() || groupIndex < 0){
+			throw new ArrayIndexOutOfBoundsException(
+				"The value given for groupIndex, " + groupIndex +
+				", is out of bounds.");
+		}//end if index invalid
+		TimeGrouping groupWithTime = groups.get(groupIndex);
+		// make sure the instance index is valid
+		List<TimedInstance> groupTimes = groups.get(groupIndex).getTimes();
+		if(instanceIndex >= groupTimes.size() || instanceIndex < 0){
+			throw new ArrayIndexOutOfBoundsException(
+				"The value given for instanceIndex, " + instanceIndex +
+				", is out of bounds.");
+		}//end if instanceIndex is invalid
+		TimedInstance instanceToRemove = groupTimes.get(instanceIndex);
+		// ask user if they're sure they want to remove the time
+		boolean response = view.confirmationMessage("Are you sure that " +
+		"you want to remove the time " + instanceToRemove.toString() +
+		" in the group " + groupWithTime.toString() + "?");
+		if(response){
+			// update local store
+			groupTimes.remove(instanceIndex);
+			groupWithTime.setTimes(groupTimes);
+			groups.set(groupIndex, groupWithTime);
+			// update groupManager with local store
+			groupManager.setGroups(groups);
+			// display message to user
+			view.logMessage("The timed instance named " +
+			instanceToRemove.toString() + " in the group " +
+			groupWithTime.toString() + " has been removed.");
+		}//end if user really does want to remove the time
+		else{
+			view.logMessage("Timed instance removal cancelled.");
+		}//end else the user doesn't really want to remove the time
+	}//end removeTime(groupIndex, instanceIndex)
 
+	/**
+	 * Removes some times. Indices should be out of total list of times.
+	 * @param indicesToRemove Collection of indices of all the times
+	 * to remove.
+	 */
+	public void removeTimes(Collection<Integer> indicesToRemove){
+		// validate all the indices and put them in right object
+		TreeSet<Integer> indicesToPass = new TreeSet<Integer>();
+		int timeCount = groupManager.getTimes().size();
+		for(int index : indicesToRemove){
+			if(index < 0 || index >= timeCount){
+				throw new ArrayIndexOutOfBoundsException("The index " +
+				index + " in indicesToRemove is invalid for the bounds " +
+				"of the list with all times across all groups.");
+			}//end if index is invalid
+			else{
+				indicesToPass.add(index);
+			}//end else index is valid
+		}//end looping adding indicesToRemove to TreeSet
+		// get a list of the times specified and ask user if they're sure
+		List<TimedInstance> times = groupManager.getTimes();
+		StringBuilder sb = new StringBuilder();
+		sb.append("Are you sure you want to delete the following times?");
+		for(int index : indicesToPass){
+			sb.append("\n" + times.get(index));
+		}//end adding times to stringbuilder
+		boolean response = view.confirmationMessage(sb.toString());
+		if(response){
+			// remove the specified instances
+			groupManager.removeTimes(indicesToPass);
+			// tell the user
+			view.logMessage(indicesToPass.size() + " times were removed.");
+		}//end if user really does want to remove times
+		else{
+			view.logMessage("Removal of timed instances cancelled.");
+		}//end else user doesn't want to remove times
+	}//end removeTimes(indicesToRemove)
+
+	/**
+	 * removes a group from the application. Gives the option of not
+	 * removing the times in the group, and instead merging them into
+	 * the Ungrouped group.
+	 * @param groupIndex
+	 */
+	public void removeGroup(int groupIndex){
+		// make sure the index is valid
+		List<TimeGrouping> groups = groupManager.getGroups();
+		if(groupIndex >= groups.size() || groupIndex < 0){
+			throw new ArrayIndexOutOfBoundsException(
+				"The value given for groupIndex, " + groupIndex +
+				", is out of bounds.");
+		}//end if index invalid
+		TimeGrouping groupToRemove = groups.get(groupIndex);
+		// ask user if they're sure they want to delete
+		boolean reallyRemove = view.confirmationMessage("Are you sure that " +
+		"you want to remove the " + groupToRemove.getName() +
+		"group? (Containing " + groupToRemove.getTimeCount() +
+		" times)");
+		if(reallyRemove){
+			if(groupToRemove.getTimeCount() > 0){
+				boolean removeTimes = view.confirmationMessage("Since " +
+				"the group you're merging has times in it, do you want " +
+				"to get rid of all " + groupToRemove.getTimeCount() +
+				" times in the group?");
+				if(!removeTimes){
+					int ungroupedIndex = ensureUngrouped();
+					groupManager.mergeGroups(
+					Math.min(groupIndex, ungroupedIndex),
+					Math.max(groupIndex, ungroupedIndex), "Ungrouped", true);
+				}//end if we should merge the times
+			}//end if group we're removing has times
+			// go ahead and remove the group
+			groups.remove(groupIndex);
+			// update groupManager with local store
+			groupManager.setGroups(groups);
+		}//end if user really does want to delete group
+		else{
+			view.logMessage("Group Removal Cancelled.");
+		}//end else user doesn't really want to delete group
+	}//end removeGroup(groupIndex)
+
+	/**
+	 * Adds the Ungrouped group to the manager if it's not
+	 * there already, and then returns the index of it.
+	 * @return The index of the ungrouped group within the
+	 * group manager.
+	 */
+	protected int ensureUngrouped(){
+		List<TimeGrouping> groups = groupManager.getGroups();
+		int index2 = -1;
+		for(int i = 0; i < groups.size(); i++){
+			if(groups.get(i).getName().equals("Ungrouped")){
+				index2 = i;
+				break;
+			}//end if we found Ungrouped
+		}//end looking for Ungrouped in groups
+		if(index2 == -1){
+			index2 = groups.size();
+			groups.add(new TimeGrouping("Ungrouped"));
+			groupManager.setGroups(groups);
+		}//end if we should create Ungrouped
+		return index2;
+	}//end ensureUngrouped()
+
+	/**
+	 * Allows a group to be edited.
+	 * @param groupIndex The index of the group which should be
+	 * edited.
+	 */
 	public void editGroup(int groupIndex){
 		// make sure indices are valid and get right index from store
 		List<TimeGrouping> groups = groupManager.getGroups();
@@ -264,7 +417,7 @@ public class TimeController {
 		}//end else user didn't really want to edit instance
 	}//end editInstance(groupIndex, instanceIndex)
 
-	// TODO: Make sure that TimedInstance references totheir group get updates
+	// TODO: Make sure that TimedInstance references to their group get updates
 	// TODO: Add methods for archiving times or groups
 
 	/**
