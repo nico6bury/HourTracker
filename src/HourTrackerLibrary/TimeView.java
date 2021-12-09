@@ -5,6 +5,7 @@ package HourTrackerLibrary;
  */
 public interface TimeView {
 	public void refreshView();
+	public void updateTime();
 	public String getSelectedGroupName();
 	public String getCurrentInstanceName();
 	public String getPathWithMessage(String message);

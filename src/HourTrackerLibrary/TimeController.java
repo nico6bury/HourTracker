@@ -1,7 +1,7 @@
 package HourTrackerLibrary;
 
 import java.time.*;
-import java.util.List;
+import java.util.*;
 
 /**
  * 
@@ -32,6 +32,10 @@ public class TimeController {
 	protected TimeStorageIO fileio = new TimeStorageIO();
 
 	/**
+	 * Time update interval in mulliseconds.
+	 */
+	public long timeUpdateInterval = 500;
+	/**
 	 * Initializes this controller object with the view it should be
 	 * yeeting its method calls over to.
 	 * @param view The view that should be associated with
@@ -39,6 +43,7 @@ public class TimeController {
 	 */
 	public TimeController(TimeView view){
 		this.view = view;
+		this.timeTask = new UpdateTimeTask(this.view);
 		// make sure we have a good file path
 		if(fileio.getStorageDirectory().equals("")){
 			// log message about no config file found
@@ -66,6 +71,68 @@ public class TimeController {
 	}//end sole constructor
 
 	/**
+	 * TimerTask for calling updateTime method in view.
+	 */
+	protected class UpdateTimeTask extends TimerTask{
+		TimeView view = null;
+		protected UpdateTimeTask(TimeView view){ this.view = view; }
+		public void run(){ view.updateTime(); }
+	}//end class UpdateTimeTask
+
+	/**
+	 * The timer we use for updating time for user.
+	 */
+	Timer clock = new Timer();
+	UpdateTimeTask timeTask;
+	/**
+	 * Starts the controller's internal clock for updating time in view.
+	 */
+	public void startClock(){
+		clock.scheduleAtFixedRate(timeTask, 0, timeUpdateInterval);
+	}//end startClock()
+
+	/**
+	 * Stops the controller's internal clock from updating, freeing
+	 * up a few more resources.
+	 */
+	public void stopClock(){
+		timeTask.cancel();
+		clock.cancel();
+		clock.purge();
+	}//end stopClock()
+
+	/**
+	 * The amount of time user has been clocked in.
+	 * @return Amount of time user has been clocked in if they
+	 * are clocked in, or 0 otherwise.
+	 */
+	public Duration getClockedTime(){
+		if(currentlyClocked){
+			return Duration.between(clockInTime, Instant.now());
+		}//end if currently clocked in
+		else{
+			return Duration.ofNanos(0);
+		}//end else not clocked in
+	}//end getClockedTime()
+
+	/**
+	 * The projected total time of current group if you clock out
+	 * with the time you have currently.
+	 * @return Projected total time for group if group is valid,
+	 * normal clockedTime behavior if no group found.
+	 */
+	public Duration getProjectedGroupTotalTime(){
+		try{
+			TimeGrouping curGroup = groupManager
+			.getGroups().get(curGroupIndex);
+			return curGroup.getTotalTime().plus(getClockedTime());
+		}//end trying to get group stuff
+		catch (ArrayIndexOutOfBoundsException e){
+			e.printStackTrace();
+			return getClockedTime();
+		}//end catching ArrayIndexOutOfBoundsExceptions
+	}//end getProjectedGroupTotalTime()
+	/**
 	 * Method that should be called when the user clocks in.
 	 */
 	public void clockIn(){
@@ -85,8 +152,6 @@ public class TimeController {
 		currentlyClocked = false;
 		view.refreshView();
 	}//end clockOut()
-
-	// TODO: Add methods for efficiently handling ticking while clocked
 
 	/**
 	 * Adds a time that has been manually entered in by a user. Sets

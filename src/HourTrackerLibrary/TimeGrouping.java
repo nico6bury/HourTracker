@@ -1,5 +1,6 @@
 package HourTrackerLibrary;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,6 +63,14 @@ public class TimeGrouping {
         return times.size();
     }//end getTimeCount()
     
+    public Duration getTotalTime(){
+        Duration total = Duration.ofNanos(0);
+        for(TimedInstance time : times){
+            total = total.plus(time.getDuration());
+        }//end looping over times in group
+        return total;
+    }//end getTotalTime()
+
     /**
      * Total number of minutes in class.
      * @return Duration.getSeconds() / 60.0
