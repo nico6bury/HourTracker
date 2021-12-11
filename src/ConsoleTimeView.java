@@ -15,7 +15,7 @@ public class ConsoleTimeView implements TimeView {
     protected Scanner reader = new Scanner(System.in);
 
     /**
-     * THe main method for this view,
+     * The main method for this view,
      * @param args Args provided here.
      */
     public static void main(String[] args) {
