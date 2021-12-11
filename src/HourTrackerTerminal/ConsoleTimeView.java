@@ -252,6 +252,9 @@ public class ConsoleTimeView implements TimeView {
                 sb.append("\n");
                 messageCount++;
             }//end looping over messages
+            if(messageCount == 0){
+                sb.append("No Messages Yet\n");
+            }//end if there are no messags yet.
             return sb.toString();
         }//end buildMessages(messages)
 
@@ -274,6 +277,9 @@ public class ConsoleTimeView implements TimeView {
                 sb.append(groups.get(i).getTotalTime());
                 sb.append("\n");
             }//end looping over groups
+            if(groupCount == 0){
+                sb.append("No Groups Yet\n");
+            }//end if there are no groups yet
             return sb.toString();
         }//end buildGroups(controller)
 
@@ -312,6 +318,9 @@ public class ConsoleTimeView implements TimeView {
                     sb.append("\n");
                 }//end looping over times in group
             }//end looping over groups
+            if(timeCount == 0){
+                sb.append("No Timed Instances Yet\n");
+            }//end if there are no times yet
             return sb.toString();
         }//end buildTimes(controller)
 
