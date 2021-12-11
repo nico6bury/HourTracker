@@ -1,4 +1,4 @@
-import HourTrackerLibrary.*;
+package HourTrackerTerminal;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -7,11 +7,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
 
+import HourTrackerLibrary.TimeController;
+import HourTrackerLibrary.TimeGrouping;
+import HourTrackerLibrary.TimeView;
+import HourTrackerLibrary.TimedInstance;
+
 public class ConsoleTimeView implements TimeView {
     /**
      * The controller for this class.
      */
-    protected TimeController controller = new TimeController(this);
+    protected TimeController controller;
+    public void setController(TimeController controller){
+        this.controller = controller;
+    }//end setController(controller)
     /**
      * Scanner object for reading user input.
      */
@@ -21,18 +29,10 @@ public class ConsoleTimeView implements TimeView {
      */
     protected List<String> messages = new ArrayList<String>();
 
-    
+    public ConsoleTimeView(){
+        // nothing I guess
+    }//end no-arg constructor
 
-    /**
-     * The main method for this view,
-     * @param args Args provided here.
-     */
-    public static void main(String[] args) {
-        System.out.println("It seems things loaded correctly.");
-    }//end main method
-    
-    
-    
     /**
      * 
      * @param instance
@@ -336,6 +336,7 @@ public class ConsoleTimeView implements TimeView {
             sb.append(SEPARATOR + "\n");
             // append timed instances
             sb.append(buildTimes(controller));
+            sb.append(SEPARATOR + "\n");
             return sb.toString();
         }//end displayNormalInfo();
 

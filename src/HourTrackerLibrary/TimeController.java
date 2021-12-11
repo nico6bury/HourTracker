@@ -130,9 +130,14 @@ public class TimeController {
 	 */
 	public Duration getProjectedGroupTotalTime(){
 		try{
-			TimeGrouping curGroup = groupManager
-			.getGroups().get(curGroupIndex);
-			return curGroup.getTotalTime().plus(getClockedTime());
+			if(curGroupIndex > 0 && curGroupIndex < groupManager.getGroups().size()){
+				TimeGrouping curGroup = groupManager
+				.getGroups().get(curGroupIndex);
+				return curGroup.getTotalTime().plus(getClockedTime());
+			}//end if curGroupIndex is valid
+			else{
+				return Duration.ZERO;
+			}//end else return zero duration
 		}//end trying to get group stuff
 		catch (ArrayIndexOutOfBoundsException e){
 			e.printStackTrace();

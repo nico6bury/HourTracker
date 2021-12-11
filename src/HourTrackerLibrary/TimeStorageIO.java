@@ -125,8 +125,10 @@ public class TimeStorageIO {
 		managedFiles = new ArrayList<Path>();
 		for(String expectedFile : expectedFilenames){
 			try{
-				managedFiles.add(Paths.get(this.stateStorageDirectory.toString(),
-				expectedFile));
+				if(!stateStorageDirectory.toString().equals("")){
+					managedFiles.add(Paths.get(this.stateStorageDirectory.toString(),
+					expectedFile));
+				}//end if stateStorageDirectory not empty
 			}//end trying to add paths
 			catch (InvalidPathException e){
 				e.printStackTrace();
