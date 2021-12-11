@@ -1,7 +1,10 @@
 import HourTrackerLibrary.*;
 
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Scanner;
 
 public class ConsoleTimeView implements TimeView {
@@ -13,6 +16,12 @@ public class ConsoleTimeView implements TimeView {
      * Scanner object for reading user input.
      */
     protected Scanner reader = new Scanner(System.in);
+    /**
+     * List of messages that have been sent by the controller.
+     */
+    protected List<String> messages = new ArrayList<String>();
+
+    
 
     /**
      * The main method for this view,
@@ -22,19 +31,7 @@ public class ConsoleTimeView implements TimeView {
         System.out.println("It seems things loaded correctly.");
     }//end main method
     
-    /**
-     * 
-     */
-    protected void displayNormalInfo(){
-        // TODO Auto-generated method stub
-    }//end displayNormalInfo();
-
-    /**
-     * 
-     */
-    protected void getNormalChoice(){
-        // TODO Auto-generated method stub
-    }//end getNormalChoice();
+    
     
     /**
      * 
@@ -163,7 +160,8 @@ public class ConsoleTimeView implements TimeView {
      */
     @Override
     public void refreshView() {
-        displayNormalInfo();
+        System.out.println(ConsoleStatics
+        .displayNormalInfo(controller, messages));
     }//end refreshView()
 
     /**
@@ -171,7 +169,8 @@ public class ConsoleTimeView implements TimeView {
      */
     @Override
     public void updateTime() {
-        displayNormalInfo();
+        System.out.println(ConsoleStatics
+        .displayNormalInfo(controller, messages));
     }//end updateTime()
     
     /**
@@ -190,6 +189,161 @@ public class ConsoleTimeView implements TimeView {
      */
     @Override
     public void logMessage(String message) {
-        System.out.println(message);
+        //System.out.println(message);
+        messages.add(message);
     }//end logMessage(message)
+
+    /**
+     * Stores static messages for the ConsoleTimeView class.
+     */
+    public static class ConsoleStatics{
+        /**
+         * Separator string to go between rows.
+         */
+        protected static final String SEPARATOR =
+        "-:-:-:-:-:-:-:-:-:-:-:" +
+        "-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-";
+
+        /**
+         * 
+         * @param controller
+         * @return
+         */
+        public static String buildCurrentTime(TimeController controller){
+            StringBuilder sb = new StringBuilder();
+            // append current time stuff
+            sb.append(Instant.now());
+            sb.append(" | ");
+            sb.append(controller.getClockedTime());
+            sb.append(" | ");
+            sb.append(controller.getProjectedGroupTotalTime());
+            sb.append("\n");
+            return sb.toString();
+        }//end buildCurrentTime(controller)
+
+        /**
+         * 
+         * @param controller
+         * @return
+         */
+        public static String buildActiveGroup(TimeController controller){
+            StringBuilder sb = new StringBuilder();
+            sb.append("Active Group");
+            sb.append(" | ");
+            sb.append("Time Count");
+            sb.append(" | ");
+            sb.append("Total Time");
+            sb.append("\n");
+            return sb.toString();
+        }//end buildActiveGroup(controller)
+
+        /**
+         * 
+         * @param messages
+         * @return
+         */
+        public static String buildMessages(List<String> messages){
+            StringBuilder sb = new StringBuilder();
+            int messageCount = 0;
+            int messageLimit = 5;
+            for(int i = messages.size() - 1;
+            messageCount < messageLimit && i > 0; i--){
+                sb.append(messages.get(i));
+                sb.append("\n");
+                messageCount++;
+            }//end looping over messages
+            return sb.toString();
+        }//end buildMessages(messages)
+
+        /**
+         * 
+         * @param controller
+         * @return
+         */
+        public static String buildGroups(TimeController controller){
+            StringBuilder sb = new StringBuilder();
+            int groupCount = 0;
+            int groupLimit = 4;
+            List<TimeGrouping> groups = controller.getGroups();
+            for(int i = groups.size() - 1;
+            groupCount < groupLimit && i > 0; i--){
+                sb.append(groups.get(i).getName());
+                sb.append(" | ");
+                sb.append(groups.get(i).getTimeCount());
+                sb.append(" Times | ");
+                sb.append(groups.get(i).getTotalTime());
+                sb.append("\n");
+            }//end looping over groups
+            return sb.toString();
+        }//end buildGroups(controller)
+
+        /**
+         * 
+         * @param controller
+         * @return
+         */
+        public static String buildTimes(TimeController controller){
+            StringBuilder sb = new StringBuilder();
+            List<TimeGrouping> groups = controller.getGroups();
+            int timeCount = 0;
+            int timeLimit = 6;
+            for(int i = groups.size() - 1;
+            timeCount < timeLimit && i > 0; i++){
+                List<TimedInstance> times = groups.get(i).getTimes();
+                for(int j = times.size() - 1;
+                timeCount < timeLimit && j > 0; j++){
+                    TimedInstance time = times.get(j);
+                    sb.append(time.getName());
+                    sb.append(" | ");
+                    // add start and end time
+                    if(time.getHandleSpecificBeginEnd()){
+                        sb.append(time.getStart());
+                        sb.append(" - ");
+                        sb.append(time.getEnd());
+                        sb.append(" | ");
+                    }//end if we should have specific start and end
+                    // add duration
+                    sb.append(time.getDuration());
+                    // add date
+                    if(time.getHandleDate()){
+                        sb.append(" | ");
+                        sb.append("Date");
+                    }//end if we should include date
+                    sb.append("\n");
+                }//end looping over times in group
+            }//end looping over groups
+            return sb.toString();
+        }//end buildTimes(controller)
+
+        /**
+         * Gets a string with the current info
+         * @return 
+         */
+        protected static String displayNormalInfo(TimeController controller,
+        List<String> messages){
+            StringBuilder sb = new StringBuilder();
+            // append current time stuff
+            sb.append(buildCurrentTime(controller));
+            sb.append(SEPARATOR + "\n");
+            // append active group row
+            sb.append(buildActiveGroup(controller));
+            sb.append(SEPARATOR + "\n");
+            // append messages
+            sb.append(buildMessages(messages));
+            sb.append(SEPARATOR + "\n");
+            // append groups
+            sb.append(buildGroups(controller));
+            sb.append(SEPARATOR + "\n");
+            // append timed instances
+            sb.append(buildTimes(controller));
+            return sb.toString();
+        }//end displayNormalInfo();
+
+        /**
+         * 
+         */
+        protected void getNormalChoice(){
+            // TODO Auto-generated method stub
+        }//end getNormalChoice();
+    }//end class ConsoleStatics
 }//end class App
