@@ -162,6 +162,7 @@ public class ConsoleTimeView implements TimeView {
     public void refreshView() {
         System.out.println(ConsoleStatics
         .displayNormalInfo(controller, messages));
+        ConsoleStatics.getNormalChoice();
     }//end refreshView()
 
     /**
@@ -349,11 +350,19 @@ public class ConsoleTimeView implements TimeView {
             return sb.toString();
         }//end displayNormalInfo();
 
+        public static final String[] mainMenu = {"ClockIn / Clockout",
+    "Set...", "Add...", "Edit...", "Remove...", "Save...", "Page...",
+    "Quit"};
+
         /**
          * 
          */
-        protected void getNormalChoice(){
-            // TODO Auto-generated method stub
+        protected static void getNormalChoice(){
+            int i = 0;
+            for(char a = 'A'; a < 'Z' && i < mainMenu.length; a++){
+                System.out.print(a + ") " + mainMenu[i] + "\n");                
+                i++;
+            }//end looping through options
         }//end getNormalChoice();
     }//end class ConsoleStatics
 }//end class App
