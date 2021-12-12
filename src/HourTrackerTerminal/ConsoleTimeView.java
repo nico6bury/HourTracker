@@ -364,5 +364,57 @@ public class ConsoleTimeView implements TimeView {
                 i++;
             }//end looping through options
         }//end getNormalChoice();
+
+        /**
+         * Gives a parallel array of options for each given choice in
+         * order to make getting the user-selected option easy.
+         * @param choices The list of choices.
+         * @return Returns the parallel array of options for each
+         * given choice.
+         * @see #getChoiceText(String[])
+         */
+        @SuppressWarnings("unchecked")
+        protected static List<String>[] getValidOptions(String[] choices){
+            // create out whacky return type
+            List<String>[] validOptions =
+            (List<String>[]) new List[choices.length];
+            // loop through and generate all our stuff
+            char charOpt = 'A';
+            int numOpt = 1;
+            for(int i = 0; i < validOptions.length; i++){
+                // initialize inner list
+                validOptions[i] = new ArrayList<String>();
+                // add letter option
+                validOptions[i].add(String.valueOf(charOpt));
+                // add number option
+                validOptions[i].add(String.valueOf(numOpt));
+                // add name option
+                validOptions[i].add(choices[i]);
+                // update counter variables
+                charOpt++;
+                numOpt++;
+            }//end generating valid input for each choice
+            // return out whacky return type
+            return validOptions;
+        }//end getValidOptions();
+
+        /**
+         * Gets a list of the actual text that should be displayed
+         * in the terminal, including the text for each choice, when
+         * using with the getValidOptions(choices) method.
+         * @param choices
+         * @return Returns a list of generated choice text suitable for
+         * showing to a user in order to have them choose amongst several
+         * options.
+         * @see #getValidOptions(String[])
+         */
+        protected static List<String> getChoiceText(String[] choices){
+            List<String> choiceText = new ArrayList<String>();
+            for(char a = 'A'; a <= 'Z'; a++){
+                int curIndex = a - 65;
+                choiceText.add(a + ") " + choices[curIndex]);
+            }//end looping over choices
+            return choiceText;
+        }//end getChoiceText
     }//end class ConsoleStatics
 }//end class App
