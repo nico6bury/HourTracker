@@ -1,4 +1,4 @@
-package HourTrackerTerminal;
+package DeprecatedTimeStuff;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -19,6 +19,7 @@ public class ConsoleTimeView implements TimeView {
     protected TimeController controller;
     public void setController(TimeController controller){
         this.controller = controller;
+        // this.controller.startView();
     }//end setController(controller)
     /**
      * Scanner object for reading user input.
@@ -28,9 +29,14 @@ public class ConsoleTimeView implements TimeView {
      * List of messages that have been sent by the controller.
      */
     protected List<String> messages = new ArrayList<String>();
+    /**
+     * Console for this class?
+     */
+    // protected IHourTerminal terminal = new HourTrackerConsole();
 
     public ConsoleTimeView(){
         // nothing I guess
+        // terminal.startTerminal();
     }//end no-arg constructor
 
     /**
@@ -107,16 +113,17 @@ public class ConsoleTimeView implements TimeView {
      */
     @Override
     public String getPathWithMessage(String message) {
-        String response = "";
-        while(response.equals("")){
-            System.out.println(message);
-            System.out.print("Path: ");
-            response = reader.nextLine();
-            if(response.equals("")){
-                System.out.println("Path cannot be empty.");
-            }//end if response is blank
-        }//end looping while response is blank
-        return response;
+        return "/home/nicholas/Documents/Programming Stuff/Mischellanious Projects/HourTracker/HourTracker/bin/FileStorage";
+        // String response = "";
+        // while(response.equals("")){
+        //     System.out.println(message);
+        //     System.out.print("Path: ");
+        //     response = reader.nextLine();
+        //     if(response.equals("")){
+        //         System.out.println("Path cannot be empty.");
+        //     }//end if response is blank
+        // }//end looping while response is blank
+        // return response;
     }//end getPathWithMessage(message)
     
     /**
@@ -160,9 +167,11 @@ public class ConsoleTimeView implements TimeView {
      */
     @Override
     public void refreshView() {
-        System.out.println(ConsoleStatics
-        .displayNormalInfo(controller, messages));
-        ConsoleStatics.getNormalChoice();
+        String[] times = {"Time 1", "Time 2", "Time 3"};
+        // terminal.updateCurrentTime(times);
+        // System.out.println(ConsoleStatics
+        // .displayNormalInfo(controller, messages));
+        // ConsoleStatics.getNormalChoice();
     }//end refreshView()
 
     /**

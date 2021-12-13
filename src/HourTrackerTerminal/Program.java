@@ -12,10 +12,14 @@ import com.googlecode.lanterna.screen.*;
 import com.googlecode.lanterna.terminal.*;
 
 import HourTrackerLibrary.TimeController;
+import HourTrackerLibrary.TimeView;
 
 public class Program {
 	public static void main(String[] args){
-		lanterna4();
+		// sets up controller
+		TimeController controller = new TimeController();
+		TimeView view = new HourTrackerConsole(controller);
+		// do stuff?
 	}//end main method
 
 	public static void lanterna1(){

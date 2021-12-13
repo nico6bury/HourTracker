@@ -48,7 +48,11 @@ public class TimeController {
 	 * @param view The view that should be associated with
 	 * this controller.
 	 */
-	public TimeController(TimeView view){
+	public TimeController(){
+		// do nothing I guess
+	}//end sole constructor
+
+	public void setView(TimeView view){
 		this.view = view;
 		this.timeTask = new UpdateTimeTask(this.view);
 		// make sure we have a good file path
@@ -75,7 +79,8 @@ public class TimeController {
 			// add log message
 			view.logMessage("Found existing files. Reading them.");
 		}//end else we have stuff stored already
-	}//end sole constructor
+		view.refreshView();
+	}//end setView(view)
 
 	/**
 	 * TimerTask for calling updateTime method in view.
