@@ -1,0 +1,68 @@
+Logged in as Nicholas Sixbury
+Current Time | Current Elapsed Time | Current Projected Group Total
+Active Group | Time Count | Total Time
+-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-
+Currently Showing 5 Messages (2-6 out of 6)
+Message 2
+Message 3
+Message 4
+Message 5
+Message 6
+-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-
+Currently Showing 4 Groups (1-2 out of 2)
+Group 1 Name | Time Count | Total Time
+Group 2 Name | Time Count | Total Time
+-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-
+Currently Showing 6 Instances (4-9 out of 9)
+Instance 4 | 1 Hour, 3 Minutes
+Instance 5 | 5 Hours, 46 Minutes | YYYY-MM-DD - YYYY-MM-DD
+Instance 6 | 1:00pm - 4:00pm | 3 Hours
+Instance 7 | 10:00am - 7:00pm | 9 Hours | YYYY-MM-DD
+Instance 8 | 8:00am - 3:00pm | 7 Hours
+Instance 9 | 1 Hour | YYYY-MM-DDk
+-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-
+Main Menu
+A) ClockIn / Clockout
+B) Set...
+C) Add...
+D) Edit...
+E) Remove...
+F) Save...
+G) Page...
+H) Quit
+:) (User types option here) 
+-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-
+Set Menu
+A) Shown Messages
+B) Shown Groups
+C) Shown Times
+D) Storage Directory
+E) Back
+-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-
+Add Menu
+A) Add Previous Time
+B) Add Group
+C) Import Old Files From...
+D) Back
+-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-
+Edit Menu
+A) Edit Times
+B) Edit Group
+C) Back
+-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-
+Remove Menu
+A) Remove Times...
+B) Remove Groups...
+C) Back
+-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-
+Save Menu
+
+-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-:-
+Page Menu
+A) Messages Up
+B) Messages Down
+C) Groups Up
+D) Groups Down
+E) Times Up
+F) Times Down
+G) Back
