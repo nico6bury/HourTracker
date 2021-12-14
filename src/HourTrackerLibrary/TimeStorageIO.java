@@ -5,34 +5,16 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 import java.nio.file.Path;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.ArrayList;
-import java.util.prefs.*;
 
 /**
  * A class which handles File I/O for the
  * TimeController class.
  */
 public class TimeStorageIO {
-	/*
-	Things that I should probably include in this class:
-	* configuration file for the application that is completely handled
-	and read/written from solely from this class.
-	* internal listing of files that should be currently managed by this
-	class, updated, maybe with a private enum for their purpose, so we'd
-	keep like a hashmap of paths maybe, and then some files should be kept,
-	while others should be deleted and regenerated a bunch depending on
-	their purpose.
-	* public-facing methods that make it easy for the controller class
-	to initialize this class, read its state from the files we manage,
-	and also save stuff back to some files afterwards.
-	* and one other thing: make sure that any time we write file information,
-	we delete all the files we have registered as already written there.
-	This is basically the only way to deal with renaming groups, as that's
-	tied to the filename I've decided.
-	*/
-
 	/**
 	 * Holds all the files currently managed by this class. Each path should
 	 * be to a file holding serialized information
@@ -52,16 +34,17 @@ public class TimeStorageIO {
 	}//end getManagedFiles()
 	/**
 	 * The directory where we should store state storage files
+	 * @deprecated
 	 */
 	protected Path stateStorageDirectory = null;
 	/**
-	 * Returns string indicating path of directory where this class
-	 * stores files. The default is an empty string, so it's best to
-	 * change this.
-	 * @return 
+	 * Returns Path of the directory which the jar is located in.
+	 * @throws URISyntaxException
+	 * @deprecated
 	 */
-	public String getStorageDirectory(){
-		return stateStorageDirectory.toString();
+	public Path getStorageDirectory() throws URISyntaxException{
+		return Paths.get(getClass().getProtectionDomain()
+			.getCodeSource().getLocation().toURI().getPath());
 	}//end getStorageDirectory()
 	/**
 	 * Attempts to save a new directory path as the chosen
@@ -91,50 +74,25 @@ public class TimeStorageIO {
 			return false;
 		}//end catching InvalidPathExceptions
 	}//end saveStorageDirectory(path)
-	/**
-	 * The preferences for this package. :-)
-	 */
-	Preferences prefs = Preferences.systemNodeForPackage(this.getClass());
-	/**
-	 * Key for DefaultSerializedDirectory, or the directory where
-	 * we should, by default, store serialized objects in files that
-	 * the user could edit.
-	 */
-	protected static final String PREF_KEY_DSD = "DSD";
-	protected static final String PREF_DEFAULT_DSD = "";
-	/**
-	 * Key for SerializedStateFileNames, a string which contains
-	 * the names of all the files we should be performing I/O on
-	 * within the DSD. These will be separated by a / (forward slash).
-	 */
-	protected static final String PREF_KEY_SSFN = "SSFN";
-	protected static final String PREF_DEFAULT_SSFN = "";
 	
 	/**
 	 * Initializes this class and retrieves previously stored
 	 * system preferences.
 	 */
 	public TimeStorageIO(){
-		// get all our preferences that we need
-		String[] expectedFilenames = prefs.get(
-			PREF_KEY_SSFN, PREF_DEFAULT_SSFN
-		).split("/");
-		this.stateStorageDirectory = Paths.get(
-			prefs.get(PREF_KEY_DSD, PREF_DEFAULT_DSD)
-		);
-		managedFiles = new ArrayList<Path>();
-		for(String expectedFile : expectedFilenames){
-			try{
-				if(!stateStorageDirectory.toString().equals("")){
-					managedFiles.add(Paths.get(this.stateStorageDirectory.toString(),
-					expectedFile));
-				}//end if stateStorageDirectory not empty
-			}//end trying to add paths
-			catch (InvalidPathException e){
-				e.printStackTrace();
-			}//end catching invalidPathExceptions
-		}//end looping over expected filenames
+		// load configuration stuff
+		try {
+			Path configPath = getStorageDirectory().resolve(configFilename);
+			for(String line : Files.readAllLines(configPath)){
+				managedFiles.add(Paths.get(line));
+			}//end adding each line in file as managedFile
+		}//end trying to save config
+		catch (URISyntaxException | IOException e) {
+			e.printStackTrace();
+		}//end catching exceptions
 	}//end sole constructor
+
+	public static final String configFilename = "config.txt";
 
 	/**
 	 * Saves the current configuration in terms of which files to
@@ -144,31 +102,15 @@ public class TimeStorageIO {
 	 * the process that prevented configuration editing.
 	 */
 	public boolean saveConfiguration(){
-		try{
-			// save directory configuration
-			prefs.put(PREF_KEY_DSD, this.stateStorageDirectory.toString());
-			// format managed files to be stored in prefs
-			StringBuilder sb = new StringBuilder();
-			if(managedFiles.size() > 0) sb.append(managedFiles.get(0).toString());
-			for(int i = 1; i < managedFiles.size(); i++){
-				sb.append(managedFiles.get(i).toString() + '/');
-			}//end looping over managedFiles, skipping first
-			// save managed files configuration
-			prefs.put(PREF_KEY_SSFN, sb.toString());
+		try {
+			Path configPath = getStorageDirectory().resolve(configFilename);
+			Files.write(configPath, getManagedFiles());
 			return true;
-		}//end trying to save preferences
-		catch (NullPointerException e){
+		}//end trying to save config
+		catch (URISyntaxException | IOException e) {
 			e.printStackTrace();
 			return false;
-		}//end catching NullPointerException
-		catch (IllegalArgumentException e){
-			e.printStackTrace();
-			return false;
-		}//end catching IllegalArgumentException
-		catch (IllegalStateException e){
-			e.printStackTrace();
-			return false;
-		}//end catching IllegalStateException
+		}//end catching exceptions
 	}//end saveConfiguration()
 
 	/**
@@ -199,9 +141,16 @@ public class TimeStorageIO {
 	 * directory configured to be used for file storage.
 	 * @param groups The groups that should be saved.
 	 */
-	public void saveGroups(List<TimeGrouping> groups){
+	public boolean saveGroups(List<TimeGrouping> groups){
 		wipeManagedFiles();
-		saveGroups(groups, this.stateStorageDirectory);
+		try {
+			saveGroups(groups, getStorageDirectory());
+			return true;
+		}//end trying to save groups
+		catch (URISyntaxException e) {
+			e.printStackTrace();
+			return false;
+		}//end catching URISyntaxExceptions
 	}//end saveGroups(groups)
 
 	/**
@@ -265,4 +214,44 @@ public class TimeStorageIO {
 		}//end looping over managed files
 		managedFiles.clear();
 	}//end wipeManagedFiles()
+
+	/**
+	 * When given the name of a subdirectory and a list of filenames,
+	 * will create a directory of the specified name and ensure a file
+	 * exists in that directory with each name specified. Gives a list
+	 * of Paths to each of the files in the directory.
+	 * @param filenames The list of filenames to ensure exist. These should
+	 * be just the name of the file, but include an extension if needed.
+	 * @param foldername The name fo the subdirectory.
+	 * @return Returns a list of Paths to each of the files specified,
+	 * or null if the operation fails at any point.
+	 */
+	public List<Path> setUpDirectories(List<String> filenames,
+	String foldername){
+		List<Path> filepaths = new ArrayList<Path>();
+		try {
+			// get current directory of jar
+			Path currentDirectory = Paths.get(getClass().getProtectionDomain()
+			.getCodeSource().getLocation().toURI().getPath());
+			// make new directory for files
+			Path newDirectory = currentDirectory.resolve(foldername);
+			Files.createDirectories(newDirectory);
+			// make file for each filename
+			for(String filename : filenames){
+				// figure out path for the new file
+				Path newFile = newDirectory.resolve(filename);
+				if(Files.notExists(newFile)){
+					// if file doesn't exist, then make it
+					Files.createFile(newFile);
+				}//end if file doesn't exist
+				// file should exist either way, so add to list
+				filepaths.add(newFile);
+			}//end looping over given filenames
+		}//end trying to do file I/O stuff
+		catch (URISyntaxException | IOException e) {
+			e.printStackTrace();
+			return null;
+		}//end catching URISyntaxExceptions
+		return filepaths;
+	}//end setUpDirectories(filenames, foldername)
 }//end class TimeStorageIO
