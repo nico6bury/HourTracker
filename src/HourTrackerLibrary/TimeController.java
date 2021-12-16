@@ -160,6 +160,7 @@ public class TimeController {
 	public void clockIn(){
 		clockInTime = Instant.now();
 		this.currentlyClocked = true;
+		startClock();
 	}//end clockIn()
 
 	public void clockOut(){
@@ -172,6 +173,7 @@ public class TimeController {
 		groupManager.addTime(time, view.getSelectedGroupName());
 		// update stuff
 		currentlyClocked = false;
+		stopClock();
 		view.refreshView();
 	}//end clockOut()
 
