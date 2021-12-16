@@ -712,6 +712,7 @@ public class HourTrackerConsole implements TimeView  {
 		try {
 			// save previous cursor position
 			TerminalPosition cursor = terminal.getCursorPosition();
+			terminal.setCursorVisible(false);
 			// build array of values to display
 			String[] timeInfo = new String[3];
 			timeInfo[0] = Instant.now().toString();
@@ -719,6 +720,7 @@ public class HourTrackerConsole implements TimeView  {
 			timeInfo[2] = controller.getProjectedGroupTotalTime().toString();
 			// actually display the update
 			this.updateCurrentTime(timeInfo);
+			terminal.setCursorVisible(true);
 			// reset cursor position
 			terminal.setCursorPosition(cursor);
 		} catch (IOException e) {}
