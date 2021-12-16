@@ -12,6 +12,9 @@ import HourTrackerLibrary.TimeGrouping;
 import HourTrackerLibrary.TimeView;
 import HourTrackerLibrary.TimedInstance;
 
+/**
+ * @deprecated Use {@link HourTrackerTerminal.HourTrackerConsole}
+ */
 public class ConsoleTimeView implements TimeView {
     /**
      * The controller for this class.
@@ -46,7 +49,6 @@ public class ConsoleTimeView implements TimeView {
      */
     @Override
     public TimedInstance editInstance(TimedInstance instance) {
-        // TODO Auto-generated method stub
         return null;
     }//end editInstance(instance)
     
@@ -57,7 +59,6 @@ public class ConsoleTimeView implements TimeView {
      */
     @Override
     public TimeGrouping editGroup(TimeGrouping group) {
-        // TODO Auto-generated method stub
         return null;
     }//end editGroup(group)
     

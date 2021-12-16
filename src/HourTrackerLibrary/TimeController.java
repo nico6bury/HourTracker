@@ -52,11 +52,16 @@ public class TimeController {
 		// do nothing I guess
 	}//end sole constructor
 
+	/**
+	 * 
+	 * @param view
+	 */
+	@SuppressWarnings("unused")
 	public void setView(TimeView view){
 		this.view = view;
 		this.timeTask = new UpdateTimeTask(this.view);
 		// make sure we have a good file path
-		if(fileio.getStorageDirectory().equals("")){
+		if(false/*fileio.getStorageDirectory().equals("")*/){
 			// log message about no config file found
 			view.logMessage("No existing files found. Getting directory.");
 			// get a directory from the user
@@ -453,6 +458,7 @@ public class TimeController {
 	 * files.
 	 * @return Returns true if the operation succeeded or false if
 	 * something went wrong somehow.
+	 * @deprecated
 	 */
 	public boolean updateTimeDirectory(String directory){
 		return fileio.saveStorageDirectory(directory);
