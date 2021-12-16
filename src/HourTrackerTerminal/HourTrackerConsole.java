@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.googlecode.lanterna.graphics.TextGraphics;
@@ -115,7 +116,7 @@ public class HourTrackerConsole implements TimeView  {
 
 	/**
 	 * Displays the regular information on current stats and stuff
-	 * on the terminal.
+	 * on the terminal. Good to update before getting input.
 	 */
 	private void displayInfo() {
 		// render current time info
@@ -142,7 +143,7 @@ public class HourTrackerConsole implements TimeView  {
 	 * @param menu The menu of options to display.
 	 * @see #getOption(String[])
 	 */
-	private void displayOptions(String[] menu){
+	protected void displayOptions(String[] menu){
 		int indexCounter = 0;
 		for(String item : getChoiceText(menu)){
 			graphics.putString(1, getOptionRow() + indexCounter, item);
@@ -161,7 +162,7 @@ public class HourTrackerConsole implements TimeView  {
 	 * selected by the user.
 	 * @see #displayOptions(String[])
 	 */
-	private int getOption(String[] menu){
+	protected int getOption(String[] menu){
 		// return variable
 		int index = -1;
 		List<String>[] validOptions = getValidOptions(menu);
@@ -172,6 +173,8 @@ public class HourTrackerConsole implements TimeView  {
 		"Please try that again. Maybe it\'ll work this time.";
 		String outsideValid = "Oops! that input is not valid.";
 		String inputPref = ":) ";
+		String blankLine = "                                      " +
+		"                                                         ";
 		// loop variable
 		boolean gotInput = false;
 		while(!gotInput){
@@ -193,17 +196,18 @@ public class HourTrackerConsole implements TimeView  {
 					}//end looping over options for each choice
 				}//end looping over options for each thing
 				if(!gotInput){
+					graphics.putString(0, getInputRow(), blankLine);
 					graphics.putString(0, getInputRow(), outsideValid);
 					try{
 						terminal.bell();
 						Thread.sleep(3000);
 					} catch (InterruptedException | IOException e){
-						e.printStackTrace();
+						//e.printStackTrace();
 					}//end catching exceptions we don't cate about
 				}//end if we still haven't gotten input yet
 			}//end trying to get input from the user
 			catch (IOException e) {
-				e.printStackTrace();
+				graphics.putString(0, getInputRow(), blankLine);
 				graphics.putString(0, getInputRow(), explainError);
 				try {
 					terminal.bell();
@@ -221,7 +225,7 @@ public class HourTrackerConsole implements TimeView  {
 	 * order to make getting the user-selected option easy.
 	 * @param choices The list of choices.
 	 * @return Returns the parallel array of options for each
-	 * given choice.
+	 * given choice. Each index corresponds to a list of Strings.
 	 * @see #getChoiceText(String[])
 	 */
 	@SuppressWarnings("unchecked")
@@ -418,8 +422,12 @@ public class HourTrackerConsole implements TimeView  {
 	}//end buildTimes()
 
 	public int getUserChoice(String[] options) {
-		// Generate the actual string from the parameter to display
-		return 0;
+		// refresh regular info
+		displayInfo();
+		// display options
+		displayOptions(options);
+		// get option from user
+		return getOption(options);
 	}//end getUserChoice(options)
 
 	public TimedInstance editTimedInstance(TimedInstance timeToEdit,
@@ -450,14 +458,41 @@ public class HourTrackerConsole implements TimeView  {
 	
 	@Override
 	public String getSelectedGroupName() {
-		// TODO Auto-generated method stub
-		return "Ungrouped";
+		// TODO Have some sort of handling for more than 26 groups.
+		List<TimeGrouping> groups = controller.getGroups();
+		String[] groupMenu = new String[groups.size()];
+		for(int i = 0; i < groupMenu.length; i++){
+			groupMenu[i] = groups.get(i).getName();
+		}//end adding group names to groupMenu
+		// display regular info
+		displayInfo();
+		// display options
+		displayOptions(groupMenu);
+		// get option from user
+		int choiceIndex = getOption(groupMenu);
+		if(choiceIndex > -1 && choiceIndex < groupMenu.length){
+			return groupMenu[choiceIndex];
+		}//end if we have a valid choice found
+		else{
+			// return default-ish valud
+			return "Ungrouped";
+		}//end else we don't have a valid choice
 	}//end getSelectedGroupName()
 	
+	/**
+	 * Gets the name of an instance. Returns null if an IOException
+	 * occured.
+	 */
 	@Override
 	public String getCurrentInstanceName() {
-		// TODO Auto-generated method stub
-		return null;
+		String promptForInput = "Please enter the name for " +
+		"a time instance.";
+		graphics.putString(0, getInputRow(), promptForInput);
+		try {
+			return getInput(getInputRow()+1, ":) ");
+		} catch (IOException e) {
+			return null;
+		}//end catching IO errors
 	}//end getCurrentInstanceName()
 	
 	/**
@@ -519,8 +554,31 @@ public class HourTrackerConsole implements TimeView  {
 	
 	@Override
 	public boolean confirmationMessage(String message) {
-		// TODO Auto-generated method stub
-		return true;
+		String response = "";
+		boolean confirmation = false;
+		String[] yes = {"yes", "y", "true", "t"};
+		String[] no = {"no", "n", "false", "f"};
+		while(response == ""){
+			graphics.putString(0,getInputRow(), message);
+			try{
+				// try to get y or n from user
+				response = getInput(getInputRow()+1, "(Y/n): ");
+				if(Arrays.asList(yes).contains(response.toLowerCase())){
+					confirmation = true;
+				}//end if response was yes
+				else if(Arrays.asList(no).contains(response.toLowerCase())){
+					confirmation = false;
+				}//end if response was no
+				else{
+					// TODO: Write better error message
+					response = "";
+				}//end else response invalid
+			}//end trying to get input
+			catch(IOException e){
+				// don't do anything, basically
+			}//end catching IOExceptions
+		}//end looping while response is invalid
+		return confirmation;
 	}//end confirmationMessage(message)
 	
 	@Override
