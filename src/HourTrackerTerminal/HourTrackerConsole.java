@@ -839,7 +839,7 @@ public class HourTrackerConsole implements TimeView  {
 					confirmation = false;
 				}//end if response was no
 				else{
-					// TODO: Write better error message
+					// TODO: Write error message
 					response = "";
 				}//end else response invalid
 			}//end trying to get input
