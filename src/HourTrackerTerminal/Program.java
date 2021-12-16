@@ -20,6 +20,7 @@ public class Program {
 		TimeController controller = new TimeController();
 		TimeView view = new HourTrackerConsole(controller);
 		// do stuff?
+		((HourTrackerConsole)view).startApplicationLoop();
 	}//end main method
 
 	public static void lanterna1(){

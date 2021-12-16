@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
@@ -59,9 +60,49 @@ public class HourTrackerConsole implements TimeView  {
 	String[] editMenu = {"Edit Time", "Edit Group", "Back"};
 	String[] removeMenu = {"Remove Time", "Remove Group", "Back"};
 	String[] pageMenu = {"Messages Up", "Messages Down", "Groups Up",
-		"Groups Down", "Times Up", "Times Down"};
-
+		"Groups Down", "Times Up", "Times Down", "Back"};
+	/**
+	 * The controller for this class. Holds all our data too.
+	 */
 	protected final TimeController controller;
+	/**
+	 * Enum for menu state.
+	 */
+	protected enum MenuState{
+		/**
+		 * The main menu, with "main" controlls.
+		 */
+		MainMenu,
+		/**
+		 * The set menu, for changing certain settings.
+		 */
+		SetMenu,
+		/**
+		 * The add menu, for adding things into the application.
+		 */
+		AddMenu,
+		/**
+		 * The edit menu, for editing things in the application.
+		 */
+		EditMenu,
+		/**
+		 * The remove menu, for removing things in the application.
+		 */
+		RemoveMenu,
+		/**
+		 * The page menu, for controller pagination settings.
+		 */
+		PageMenu,
+		/**
+		 * A placeholder option for some other menu type.
+		 */
+		Other
+	}//end enum MenuState
+	/**
+	 * The current (or at least most recently updated) menu
+	 * state for this view.
+	 */
+	protected MenuState currentState = MenuState.MainMenu;
 
 	public HourTrackerConsole(TimeController controller){
 		// get the terminal started
@@ -88,6 +129,13 @@ public class HourTrackerConsole implements TimeView  {
 		return terminalStarted;
 	}//end startTerminal()
 
+	public void startApplicationLoop(){
+		boolean continueLooping = true;
+		while(continueLooping){
+			menuDecisionMatrix(-1);
+		}//end looping indefinetly
+	}//end startApplicationLoop()
+
 	public boolean stopTerminal(){
 		try{
 			terminal.close();
@@ -101,18 +149,224 @@ public class HourTrackerConsole implements TimeView  {
 		return terminalStarted;
 	}//end stopTerminal()
 
+	private boolean clearLine(int rowNum){
+		try {
+			int cols = terminal.getTerminalSize().getColumns();
+			StringBuilder sb = new StringBuilder();
+			for(int i = 0; i < cols; i++){
+				sb.append(" ");
+			}//end adding cols spaces to sb
+			graphics.putString(0,rowNum,sb.toString());
+			return true;
+		} catch (IOException e) {return false;} 
+	}//end clearLine(rowNum)
+
 	/**
-	 * Shows the main menu in addition to normal information.
+	 * Changes menus based on the choice given to the current
+	 * menu state. To re-interpret the current menu state, pass
+	 * -1 to menuChoice,
+	 * @param menuChoice The choice given by the user for the current
+	 * menu. If you want to reinterpret current menu, pass -1.
 	 */
-	public void showMainMenu() {
+	public void menuDecisionMatrix(int menuChoice){
+		switch(currentState){
+			case MainMenu:
+				if(menuChoice == -1){
+					try {
+						terminal.clearScreen();
+					} catch (IOException e) {}
+					menuChoice = showMenu(mainMenu);
+				}//end if we need to reinterpret this state
+				// figure out what to do based on option
+				switch(menuChoice){
+					case 0: // clock in/out
+						if(controller.getCurrentlyClocked()){
+							controller.clockOut();
+						}//end if we should clock out
+						else{
+							controller.clockIn();
+						}//end else we should clock in
+						break;
+					case 1: // set...
+						currentState = MenuState.SetMenu;
+						menuDecisionMatrix(-1);
+						break;
+					case 2: // add...
+						currentState = MenuState.AddMenu;
+						menuDecisionMatrix(-1);
+						break;
+					case 3: // edit...
+						currentState = MenuState.EditMenu;
+						menuDecisionMatrix(-1);
+						break;
+					case 4: // remove...
+						currentState = MenuState.RemoveMenu;
+						menuDecisionMatrix(-1);
+						break;
+					case 5: // save...
+						controller.saveCurrentState();
+						menuDecisionMatrix(-1);
+						break;
+					case 6: // page...
+						currentState = MenuState.PageMenu;
+						menuDecisionMatrix(-1);
+						break;
+					case 7: // quit
+						boolean save = confirmationMessage("Would you like " +
+						"to save before quitting?");
+						if(save){
+							controller.saveCurrentState();
+						}//end if we should save first
+						// stop the terminal
+						stopTerminal();
+						// exit program if we can
+						System.exit(0);
+						break;
+				}//end switching based on menu choice
+				break;
+			case SetMenu:
+				if(menuChoice == -1){
+					try {
+						terminal.clearScreen();
+					} catch (IOException e) {}
+					menuChoice = showMenu(setMenu);
+				}//end if we need to reinterpret this state
+				// figure out what to do based on option
+				switch(menuChoice){
+					case 0: // shown messages
+
+						break;
+					case 1: // shown groups
+
+						break;
+					case 2: // shown times
+
+						break;
+					case 3: // back
+						currentState = MenuState.MainMenu;
+						menuDecisionMatrix(-1);
+						break;
+				}//end switching based on menu choice
+				break;
+			case AddMenu:
+				if(menuChoice == -1){
+					try {
+						terminal.clearScreen();
+					} catch (IOException e) {}
+					menuChoice = showMenu(addMenu);
+				}//end if we need to reinterpret this state
+				// figure out what to do based on option
+				switch(menuChoice){
+					case 0: // add previous time
+
+						break;
+					case 1: // add group
+						
+						break;
+					case 2: // import old files from...
+
+						break;
+					case 3: // back
+						currentState = MenuState.MainMenu;
+						menuDecisionMatrix(-1);
+						break;
+				}//end switching based on menu choice
+				break;
+			case EditMenu:
+				if(menuChoice == -1){
+					try {
+						terminal.clearScreen();
+					} catch (IOException e) {}
+					menuChoice = showMenu(editMenu);
+				}//end if we need to reinterpret this state
+				// figure out what to do based on option
+				switch(menuChoice){
+					case 0: // edit time
+
+						break;
+					case 1: // edit group
+
+						break;
+					case 2: // back
+						currentState = MenuState.MainMenu;
+						menuDecisionMatrix(-1);
+						break;
+				}//end switching based on menu choice
+				break;
+			case RemoveMenu:
+				if(menuChoice == -1){
+					try {
+						terminal.clearScreen();
+					} catch (IOException e) {}
+					menuChoice = showMenu(removeMenu);
+				}//end if we need to reinterpret this state];
+				// figure out what to do based on option
+				switch(menuChoice){
+					case 0: // remove time
+
+						break;
+					case 1: // remove group
+
+						break;
+					case 2: // back
+						currentState = MenuState.MainMenu;
+						menuDecisionMatrix(-1);
+						break;
+				}//end switching based on menu choice
+				break;
+			case PageMenu:
+				if(menuChoice == -1){
+					try {
+						terminal.clearScreen();
+					} catch (IOException e) {}
+					menuChoice = showMenu(pageMenu);
+				}//end if we need to reinterpret this state
+				// figure out what to do based on option
+				switch(menuChoice){
+					case 0: // messages up
+
+						break;
+					case 1: // messages down
+
+						break;
+					case 2: // groups up
+
+						break;
+					case 3: // groups down
+
+						break;
+					case 4: // times up
+
+						break;
+					case 5: // times down
+
+						break;
+					case 6: // back
+						currentState = MenuState.MainMenu;
+						menuDecisionMatrix(-1);
+						break;
+				}//end switching based on menu choice
+				break;
+			default:
+				break;
+		}//end switching based on state
+	}//end menuDecisionMatrix(menuChoice)
+
+	/**
+	 * The generic method for displaying a menu of string options,
+	 * and then getting one of those back from the user.
+	 * @param menu The menu to be displayed.
+	 * @return Returns the index in the menu of the option chosen
+	 * by the user.
+	 */
+	public int showMenu(String[] menu){
 		// displays normal info at top
 		displayInfo();
 		// display options
-		displayOptions(mainMenu);
+		displayOptions(menu);
 		// get a thing from the user
-		int choice = getOption(mainMenu);
-		graphics.putString(0,0,"You selected " + mainMenu[choice]);
-	}//end showMainMenu()
+		return getOption(mainMenu);
+	}//end showMenu(menu)
 
 	/**
 	 * Displays the regular information on current stats and stuff
@@ -146,7 +400,9 @@ public class HourTrackerConsole implements TimeView  {
 	protected void displayOptions(String[] menu){
 		int indexCounter = 0;
 		for(String item : getChoiceText(menu)){
-			graphics.putString(1, getOptionRow() + indexCounter, item);
+			int row = getOptionRow() + indexCounter;
+			clearLine(row);
+			graphics.putString(1, row, item);
 			indexCounter++;
 		}//end printing out each item in menu
 		curOptionsCount = indexCounter;
@@ -173,14 +429,11 @@ public class HourTrackerConsole implements TimeView  {
 		"Please try that again. Maybe it\'ll work this time.";
 		String outsideValid = "Oops! that input is not valid.";
 		String inputPref = ":) ";
-		String blankLine = "                                      " +
-		"                                                         ";
 		// loop variable
 		boolean gotInput = false;
 		while(!gotInput){
-			int optionRow = getOptionRow();
-			int inputRow = getInputRow();
 			// put text prompting user for input
+			clearLine(getInputRow());
 			graphics.putString(0, getInputRow(), promptForInput);
 			// put the little :_ thing by where user should input
 			//graphics.putString(0, getInputRow()+1, inputPref);
@@ -196,7 +449,7 @@ public class HourTrackerConsole implements TimeView  {
 					}//end looping over options for each choice
 				}//end looping over options for each thing
 				if(!gotInput){
-					graphics.putString(0, getInputRow(), blankLine);
+					clearLine(getInputRow());
 					graphics.putString(0, getInputRow(), outsideValid);
 					try{
 						terminal.bell();
@@ -207,7 +460,7 @@ public class HourTrackerConsole implements TimeView  {
 				}//end if we still haven't gotten input yet
 			}//end trying to get input from the user
 			catch (IOException e) {
-				graphics.putString(0, getInputRow(), blankLine);
+				clearLine(getInputRow());
 				graphics.putString(0, getInputRow(), explainError);
 				try {
 					terminal.bell();
@@ -284,6 +537,7 @@ public class HourTrackerConsole implements TimeView  {
 		if(sb.length() > 0) sb.setLength(sb.length() - 3);
 		lastTime = sb.toString();
 		// Actually render the text to the screen
+		clearLine(getCurTimeRow());
 		graphics.putString(1, getCurTimeRow(), lastTime);
 	}//end updateCurrentTime(times)
 	
@@ -297,6 +551,7 @@ public class HourTrackerConsole implements TimeView  {
 		if(sb.length() > 0) {sb.setLength(sb.length() - 3);}
 		lastActiveGroup = "";
 		// actually render the text to the screen
+		clearLine(getGroupRow());
 		graphics.putString(1, getGroupRow(), lastActiveGroup);
 	}//end of updateActiveGroup(groupStats)
 
@@ -317,6 +572,7 @@ public class HourTrackerConsole implements TimeView  {
 		// actually render the text to the screen
 		for(int i = 0; i < curMessageCount; i++){
 			int col = i + getMessageRow();
+			clearLine(col);
 			graphics.putString(1, col, messages.get(i));
 		}//end looping over the messages
 	}//end updateMessages()
@@ -344,6 +600,7 @@ public class HourTrackerConsole implements TimeView  {
 		// actually render the text to the screen
 		for(int i = 0; i < curGroupCount; i++) {
 			int col = i + getGroupRow();
+			clearLine(col);
 			graphics.putString(1, col, groups.get(i));
 		}//end rendering each group to the screen
 	}//end updateGroups(groups)
@@ -379,6 +636,7 @@ public class HourTrackerConsole implements TimeView  {
 		// actually render the text to the screen
 		for(int i = 0; i < curTimeCount; i++) {
 			int col = i + getTimeRow();
+			clearLine(col);
 			graphics.putString(1, col, times.get(i));
 		}//end rendering each time to the screen
 	}//end updateTimes(times)
@@ -444,16 +702,24 @@ public class HourTrackerConsole implements TimeView  {
 	
 	@Override
 	public void refreshView() {
-		this.showMainMenu();
+		displayInfo();
 	}//end refreshView()
 	
 	@Override
 	public void updateTime() {
-		String[] timeInfo = new String[3];
-		timeInfo[0] = Instant.now().toString();
-		timeInfo[1] = controller.getClockedTime().toString();
-		timeInfo[2] = controller.getProjectedGroupTotalTime().toString();
-		this.updateCurrentTime(timeInfo);
+		try {
+			// save previous cursor position
+			TerminalPosition cursor = terminal.getCursorPosition();
+			// build array of values to display
+			String[] timeInfo = new String[3];
+			timeInfo[0] = Instant.now().toString();
+			timeInfo[1] = controller.getClockedTime().toString();
+			timeInfo[2] = controller.getProjectedGroupTotalTime().toString();
+			// actually display the update
+			this.updateCurrentTime(timeInfo);
+			// reset cursor position
+			terminal.setCursorPosition(cursor);
+		} catch (IOException e) {}
 	}//end updateTime()
 	
 	@Override
@@ -487,6 +753,7 @@ public class HourTrackerConsole implements TimeView  {
 	public String getCurrentInstanceName() {
 		String promptForInput = "Please enter the name for " +
 		"a time instance.";
+		clearLine(getInputRow());
 		graphics.putString(0, getInputRow(), promptForInput);
 		try {
 			return getInput(getInputRow()+1, ":) ");
@@ -524,6 +791,7 @@ public class HourTrackerConsole implements TimeView  {
 	public String getInput(int rowNum, String rowStart) throws IOException{
 		terminal.setCursorVisible(true);
 		StringBuilder full = new StringBuilder();
+		clearLine(rowNum);
 		graphics.putString(0, rowNum, rowStart);
 		KeyStroke keyStroke = terminal.readInput();
 		while(keyStroke.getKeyType() != KeyType.Enter){
@@ -559,6 +827,7 @@ public class HourTrackerConsole implements TimeView  {
 		String[] yes = {"yes", "y", "true", "t"};
 		String[] no = {"no", "n", "false", "f"};
 		while(response == ""){
+			clearLine(getInputRow());
 			graphics.putString(0,getInputRow(), message);
 			try{
 				// try to get y or n from user
