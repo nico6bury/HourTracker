@@ -582,7 +582,7 @@ public class HourTrackerConsole implements TimeView  {
 		int messageCount = 0;
 		int messageLimit = 5;
 		for(int i = messages.size() - 1;
-		messageCount < messageLimit && i > 0; i--){
+		messageCount < messageLimit && i >= 0; i--){
 			messages.add(savedMessages.get(i) + "\n");
 			messageCount++;
 		}//end looping over messages
@@ -612,7 +612,7 @@ public class HourTrackerConsole implements TimeView  {
 		List<TimeGrouping> timeGroupings = controller.getGroups();
 		StringBuilder sb = new StringBuilder();
 		for(int i = timeGroupings.size() - 1;
-		groupCount < groupLimit && i > 0; i--){
+		groupCount < groupLimit && i >= 0; i--){
 			sb.append(timeGroupings.get(i).getName());
 			sb.append(" | ");
 			sb.append(timeGroupings.get(i).getTimeCount());
@@ -621,6 +621,7 @@ public class HourTrackerConsole implements TimeView  {
 			sb.append("\n");
 			groups.add(sb.toString());
 			sb.setLength(0);
+			groupCount++;
 		}//end looping over groups
 		if(groups.size() == 0){
 			groups.add("No Groups Yet\n");
@@ -648,10 +649,10 @@ public class HourTrackerConsole implements TimeView  {
 		int timeLimit = 6;
 		StringBuilder sb = new StringBuilder();
 		for(int i = timeGroupings.size() - 1;
-		timeCount < timeLimit && i > 0; i++){
+		timeCount < timeLimit && i >= 0; i--){
 			List<TimedInstance> times = timeGroupings.get(i).getTimes();
 			for(int j = times.size() - 1;
-			timeCount < timeLimit && j > 0; j++){
+			timeCount < timeLimit && j >= 0; j--){
 				TimedInstance time = times.get(j);
 				sb.append(time.getName());
 				sb.append(" | ");
@@ -671,6 +672,7 @@ public class HourTrackerConsole implements TimeView  {
 				}//end if we should include date
 				lines.add(sb.toString());
 				sb.setLength(0);
+				timeCount++;
 			}//end looping over times in group
 		}//end looping over groups
 		if(timeCount == 0){
@@ -730,6 +732,23 @@ public class HourTrackerConsole implements TimeView  {
 		for(int i = 0; i < groupMenu.length; i++){
 			groupMenu[i] = groups.get(i).getName();
 		}//end adding group names to groupMenu
+		if(groupMenu.length == 0){
+			groupMenu = new String[1];
+			groupMenu[0] = "Ungrouped";
+		}//end if menu is empty
+		else if(!Arrays.asList(groupMenu).contains("Ungrouped")){
+			// add Ungrouped group to the array
+			String[] temp = new String[groupMenu.length];
+			for(int i = 0; i < groupMenu.length; i++){
+				temp[i] = groupMenu[i];
+			}//end adding all the options back to the menu
+			temp[temp.length - 1] = "Ungrouped";
+			groupMenu = temp;
+		}//end if menu doesn't contain Ungrouped
+		// clear previous input
+		try {
+			terminal.clearScreen();
+		} catch (IOException e) {}
 		// display regular info
 		displayInfo();
 		// display options
