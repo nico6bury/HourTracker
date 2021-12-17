@@ -304,6 +304,7 @@ public class HourTrackerConsole implements TimeView  {
 						currentState = MenuState.SetMenu;
 						menuDecisionMatrix(-1);
 						break;
+						// TODO: Allow setting active group
 					case 3: // back
 						//currentState = MenuState.MainMenu;
 						// do nothing to cancel out recursion
@@ -321,13 +322,13 @@ public class HourTrackerConsole implements TimeView  {
 				// figure out what to do based on option
 				switch(menuChoice){
 					case 0: // add previous time
-
+					// TODO: Implement functionallity for adding times
 						break;
 					case 1: // add group
 						controller.addGroup();
 						break;
 					case 2: // import old files from...
-
+					// TODO: Allow older files to be imported.
 						break;
 					case 3: // back
 						//currentState = MenuState.MainMenu;
@@ -346,10 +347,10 @@ public class HourTrackerConsole implements TimeView  {
 				// figure out what to do based on option
 				switch(menuChoice){
 					case 0: // edit time
-
+					// TODO: Implement editing functionallity
 						break;
 					case 1: // edit group
-
+					// TODO: Implement editing functionallity
 						break;
 					case 2: // back
 						//currentState = MenuState.MainMenu;
@@ -418,22 +419,22 @@ public class HourTrackerConsole implements TimeView  {
 				// figure out what to do based on option
 				switch(menuChoice){
 					case 0: // messages up
-
+					// TODO: implement feature
 						break;
 					case 1: // messages down
-
+					// TODO: implement feature
 						break;
 					case 2: // groups up
-
+					// TODO: implement feature
 						break;
 					case 3: // groups down
-
+					// TODO: implement feature
 						break;
 					case 4: // times up
-
+					// TODO: implement feature
 						break;
 					case 5: // times down
-
+					// TODO: implement feature
 						break;
 					case 6: // back
 						//currentState = MenuState.MainMenu;
@@ -734,6 +735,7 @@ public class HourTrackerConsole implements TimeView  {
 		StringBuilder sb = new StringBuilder();
 		for(int i = timeGroupings.size() - 1;
 		groupCount < maxGroups && i >= 0; i--){
+			// TODO: Implement better string formatting
 			sb.append(timeGroupings.get(i).getName());
 			sb.append(" | ");
 			sb.append(timeGroupings.get(i).getTimeCount());
@@ -773,6 +775,7 @@ public class HourTrackerConsole implements TimeView  {
 			List<TimedInstance> times = timeGroupings.get(i).getTimes();
 			for(int j = times.size() - 1;
 			timeCount < maxTimes && j >= 0; j--){
+				// TODO: Implement better string formatting
 				TimedInstance time = times.get(j);
 				sb.append(time.getName());
 				sb.append(" | ");
@@ -835,6 +838,7 @@ public class HourTrackerConsole implements TimeView  {
 			terminal.setCursorVisible(false);
 			// build array of values to display
 			String[] timeInfo = new String[3];
+			// TODO: Implement better string formatting
 			timeInfo[0] = Instant.now().toString();
 			timeInfo[1] = controller.getClockedTime().toString();
 			timeInfo[2] = controller.getProjectedGroupTotalTime().toString();
