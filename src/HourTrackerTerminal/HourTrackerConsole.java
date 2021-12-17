@@ -701,7 +701,7 @@ public class HourTrackerConsole implements TimeView  {
 	protected List<String> buildMessages(){
 		List<String> messages = new ArrayList<String>();
 		int messageCount = 0;
-		for(int i = messages.size() - 1;
+		for(int i = savedMessages.size() - 1;
 		messageCount < maxMessages && i >= 0; i--){
 			messages.add(savedMessages.get(i) + "\n");
 			messageCount++;
