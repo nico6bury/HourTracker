@@ -28,6 +28,31 @@ public class TimeGroupManager {
     public void setGroups(List<TimeGrouping> groups) {
         this.groups = groups;
     }//end setGroups(groups)
+    /**
+     * Adds a group to the manager.
+     * @param group The group to add.
+     */
+    public void addGroup(TimeGrouping group){
+        this.groups.add(group);
+    }//end addGroup(group)
+    /**
+     * Removes a specific group.
+     * @param group The group to remove.
+     * @return Returns true if the operation succeeded, false if it didn't.
+     * Method also returns false if the specified group was not in this
+     * manager.
+     */
+    public boolean removeGroup(TimeGrouping group){
+        return this.groups.remove(group);
+    }//end removeGroup(group)
+    /**
+     * Removes a group at the specified index.
+     * @param index The index of the group to remove.
+     * @return Returns the group that was at the specified position.
+     */
+    public TimeGrouping removeGroupAt(int index){
+        return this.groups.remove(index);
+    }//end removeGroupAt(index)
 
     /**
      * Gets the TimedInstance sorta at the index.
