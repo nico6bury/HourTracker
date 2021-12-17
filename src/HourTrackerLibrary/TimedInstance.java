@@ -2,6 +2,7 @@ package HourTrackerLibrary;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.util.StringTokenizer;
 import java.lang.reflect.*;
 
 /**
@@ -312,15 +313,15 @@ public class TimedInstance {
         StringBuilder sb = new StringBuilder();
 
         // add name to string
-        sb.append("name:" + this.name + "|");
+        sb.append("name@" + this.name + "|");
         // add booleans to string
-        sb.append("handleSpecificBeginEnd:" +
+        sb.append("handleSpecificBeginEnd@" +
             this.handleSpecificBeginEnd + "|");
-        sb.append("handleDate:" + this.handleDate + "|");
+        sb.append("handleDate@" + this.handleDate + "|");
         // add start to string
-        sb.append("start:" + this.start + "|");
+        sb.append("start@" + this.start + "|");
         // add end to string
-        sb.append("end:" + this.end + "|");
+        sb.append("end@" + this.end + "|");
 
         return sb.toString();
     }//end formatForFile()
@@ -331,31 +332,38 @@ public class TimedInstance {
      * @param serial
      */
     public void deserialize(String serial){
-        String[] serialComponents = serial.split("|");
-        for(String component : serialComponents){
-            String[] componentComponents = component.split(":");
-            if(componentComponents.length == 2){
+        // split into individual properties
+        StringTokenizer serialTokenizer = new StringTokenizer(serial,"|");
+        while(serialTokenizer.hasMoreTokens()){
+            String component = serialTokenizer.nextToken();
+            // split each property into hopefully two pieces
+            StringTokenizer componentTokenizer =
+            new StringTokenizer(component, "@");
+            if(componentTokenizer.countTokens() == 2){
                 try{
+                    String part1 = componentTokenizer.nextToken();
+                    String part2 = componentTokenizer.nextToken();
                     Field componentField = getClass()
-                        .getField(componentComponents[0]);
+                        .getDeclaredField(part1);
                     if(componentField.canAccess(this)){
                         // figure out the type and convert it accordingly
                         if(componentField.getType() == LocalDateTime.class){
                             LocalDateTime value = LocalDateTime
-                                .parse(componentComponents[1]);
+                                .parse(part2);
                             componentField.set(this, value);
                         }//end if we're working with an instant
                         else if(componentField.getType() == Duration.class){
+                            // currently, this code block will never execute
                             Duration value = Duration
-                                .parse(componentComponents[1]);
+                                .parse(part2);
                             componentField.set(this, value);
                         }//end else if we're working with a duration
                         else if(componentField.getType() == String.class){
-                            componentField.set(this, componentComponents[1]);
+                            componentField.set(this, part2);
                         }//end else if we're working with a string
                         else if(componentField.getType() == boolean.class){
                             boolean value = Boolean
-                                .parseBoolean(componentComponents[1]);
+                                .parseBoolean(part2);
                             componentField.set(this, value);
                         }//end else if we're working with a boolean
                     }//end if we can access the field in question
@@ -368,5 +376,7 @@ public class TimedInstance {
                 }//end catching illegalAccessExceptions
             }//end if the component was parsed successfully
         }//end looping over each component of the line
+        // set duration in order to account for not reading it in file
+        this.duration = Duration.between(start, end);
     }//end deserialize(serial)
 }//end class TimedInstance
