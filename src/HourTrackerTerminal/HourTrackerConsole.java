@@ -38,10 +38,15 @@ public class HourTrackerConsole implements TimeView  {
 	int maxMessages = 4;
 	int maxGroups = 4;
 	int maxTimes = 4;
-	boolean isGroupActive = false;
+	/**
+	 * The index in the controller's group list
+	 * of the group we consider active. No active
+	 * group if this is set to -1.
+	 */
+	int activeGroupIndex = -1;
 	int getCurTimeRow(){return 1;}
 	int getActiveGroupRow(){
-		if(isGroupActive) return getCurTimeRow() + 1 + 1;
+		if(activeGroupIndex != -1) return getCurTimeRow() + 1 + 1;
 		else return getCurTimeRow();
 	}//end getActiveGroupColumn()
 	int getMessageRow(){return getActiveGroupRow() + 1 + 1;}
@@ -57,7 +62,7 @@ public class HourTrackerConsole implements TimeView  {
 	String[] mainMenu = {"ClockIn / Clockout", "Set...", "Add...", "Edit...",
 		"Remove...", "Save...", "Page...", "Quit"};
 	String[] setMenu = {"Shown Messages", "Shown Groups", "Shown Times",
-		"Back"};
+		"Active Group","Back"};
 	String[] addMenu = {"Add Previous Time", "Add Group",
 	"Import Old Files From...", "Back"};
 	String[] editMenu = {"Edit Time", "Edit Group", "Back"};
@@ -312,11 +317,23 @@ public class HourTrackerConsole implements TimeView  {
 						currentState = MenuState.SetMenu;
 						menuDecisionMatrix(-1);
 						break;
-						// TODO: Allow setting active group
-					case 3: // back
-						//currentState = MenuState.MainMenu;
-						// do nothing to cancel out recursion
-						//menuDecisionMatrix(-1);
+					case 3: // active group
+						String groupName = getSelectedGroupName();
+						if(!controller.containsGroup(groupName)){
+							controller.addGroup(groupName);
+						}//end if group already exists
+						int activeIndex = -1;
+						for(int i = 0; i < controller.getGroups().size(); i++){
+							if(controller.getGroup(i).getName()
+							.equals(groupName)){
+								activeIndex = i;
+								break;
+							}//end if we found index
+						}//end looking for index of groupName
+						activeGroupIndex = activeIndex;
+						controller.setActiveGroupIndex(activeGroupIndex);
+						break;
+					default:
 						break;
 				}//end switching based on menu choice
 				break;
@@ -515,8 +532,10 @@ public class HourTrackerConsole implements TimeView  {
 		updateTime();
 		graphics.putString(1, getCurTimeRow() + 1, SEPARATOR);
 		// render active group info
-		updateActiveGroup(buildActiveGroup());
-		graphics.putString(1, getActiveGroupRow()+1, SEPARATOR);
+		if(activeGroupIndex != -1){
+			updateActiveGroup(buildActiveGroup());
+			graphics.putString(1, getActiveGroupRow()+1, SEPARATOR);
+		}//end if there actually is a group selected rn
 		// render messages
 		updateMessages(buildMessages());
 		graphics.putString(1, getMessageRow()+curMessageCount, SEPARATOR);
@@ -687,17 +706,25 @@ public class HourTrackerConsole implements TimeView  {
 			sb.append(groupStat).append(" | ");
 		}//end building group stats together
 		if(sb.length() > 0) {sb.setLength(sb.length() - 3);}
-		lastActiveGroup = "";
+		lastActiveGroup = sb.toString();
 		// actually render the text to the screen
-		clearLine(getGroupRow());
-		graphics.putString(1, getGroupRow(), lastActiveGroup);
+		clearLine(getActiveGroupRow());
+		graphics.putString(1, getActiveGroupRow(), lastActiveGroup);
 	}//end of updateActiveGroup(groupStats)
 
 	protected String[] buildActiveGroup(){
 		String[] groupInfo = new String[3];
-		groupInfo[0] = "Active Group";
-		groupInfo[1] = "Time Count";
-		groupInfo[2] = "Total Time";
+		if(activeGroupIndex == -1){
+			groupInfo[0] = "Active Group";
+			groupInfo[1] = "Time Count";
+			groupInfo[2] = "Total Time";
+		}//end if we should just set default
+		else{
+			TimeGrouping active = controller.getGroup(activeGroupIndex);
+			groupInfo[0] = active.getName();
+			groupInfo[1] = Integer.toString(active.getTimeCount());
+			groupInfo[2] = formatDuration(active.getTotalTime());
+		}//end else we should populate actual data
 		return groupInfo;
 	}//end buildActiveGroup()
 	

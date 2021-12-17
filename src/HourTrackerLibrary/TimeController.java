@@ -16,6 +16,9 @@ public class TimeController {
 	
 	private TimeGroupManager groupManager = new TimeGroupManager();
 	protected int curGroupIndex = -1;
+	public void setActiveGroupIndex(int index){
+		curGroupIndex = index;
+	}//end setActiveGroupIndex(index)
 	public String getCurrentGroupName(){
 		try{
 			return groupManager.getGroups().get(curGroupIndex).getName();
@@ -180,7 +183,7 @@ public class TimeController {
 	 */
 	public Duration getProjectedGroupTotalTime(){
 		try{
-			if(curGroupIndex > 0 && curGroupIndex < groupManager.getGroups().size()){
+			if(curGroupIndex >= 0 && curGroupIndex < groupManager.getGroups().size()){
 				TimeGrouping curGroup = groupManager
 				.getGroups().get(curGroupIndex);
 				return curGroup.getTotalTime().plus(getClockedTime());
