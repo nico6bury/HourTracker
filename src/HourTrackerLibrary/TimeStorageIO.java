@@ -2,6 +2,7 @@ package HourTrackerLibrary;
 
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.nio.file.Path;
 import java.io.IOException;
@@ -83,12 +84,17 @@ public class TimeStorageIO {
 		// load configuration stuff
 		try {
 			Path configPath = getStorageDirectory().resolve(configFilename);
-			for(String line : Files.readAllLines(configPath)){
-				managedFiles.add(Paths.get(line));
-			}//end adding each line in file as managedFile
+			if(Files.exists(configPath)){
+				for(String line : Files.readAllLines(configPath)){
+					managedFiles.add(Paths.get(line));
+				}//end adding each line in file as managedFile
+			}//end if config file exists
+			else{
+				Files.createFile(configPath);
+			}//end if we have to make the config file
 		}//end trying to save config
 		catch (URISyntaxException | IOException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}//end catching exceptions
 	}//end sole constructor
 

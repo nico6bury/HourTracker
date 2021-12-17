@@ -453,7 +453,8 @@ public class TimeController {
 	 * successfully, or false if something failed.
 	 */
 	public boolean saveCurrentState(){
-		return fileio.saveConfiguration();
+		return fileio.saveGroups(groupManager.getGroups())
+		&& fileio.saveConfiguration();
 	}//end saveCurrentState()
 	
 	/**
