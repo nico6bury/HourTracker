@@ -3,7 +3,6 @@ package HourTrackerTerminal;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.time.Duration;
-import java.time.Instant;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
