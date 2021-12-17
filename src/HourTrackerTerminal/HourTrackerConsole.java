@@ -387,12 +387,16 @@ public class HourTrackerConsole implements TimeView  {
 							for(int i = 0; i < groups.length; i++){
 								groups[i] = controller.getGroup(i).getName();
 							}//end adding group names to groups
+							// clear the screen
+							try {terminal.clearScreen();} catch (IOException e) {}
 							int groupIndex = showMenu(groups);
 							TimeGrouping group = controller.getGroup(groupIndex);
 							String[] times = new String[group.getTimeCount()];
 							for(int i = 0; i < times.length; i++){
 								times[i] = group.getTime(i).toString();
 							}//end adding timed instances to times
+							// clear the screen
+							try {terminal.clearScreen();} catch (IOException e) {}
 							int timeIndex = showMenu(times);
 							controller.removeTime(groupIndex, timeIndex);
 						}//end else there are times
@@ -407,6 +411,8 @@ public class HourTrackerConsole implements TimeView  {
 							for(int i = 0; i < groups.length; i++){
 								groups[i] = controller.getGroup(i).getName();
 							}//end adding group names to groups
+							// clear the screen
+							try {terminal.clearScreen();} catch (IOException e) {}
 							int groupIndex = showMenu(groups);
 							controller.removeGroup(groupIndex);
 						}//end else there is at least one group
