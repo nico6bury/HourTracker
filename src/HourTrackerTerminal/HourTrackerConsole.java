@@ -31,6 +31,9 @@ public class HourTrackerConsole implements TimeView  {
 	int curGroupCount = 0;
 	int curTimeCount = 0;
 	int curOptionsCount = 0;
+	int maxMessages = 4;
+	int maxGroups = 4;
+	int maxTimes = 4;
 	boolean isGroupActive = false;
 	int getCurTimeRow(){return 1;}
 	int getActiveGroupRow(){
@@ -100,6 +103,10 @@ public class HourTrackerConsole implements TimeView  {
 	 */
 	protected MenuState currentState = MenuState.MainMenu;
 
+	/**
+	 * Sole constructor for this class.
+	 * @param controller Controller for this class.
+	 */
 	public HourTrackerConsole(TimeController controller){
 		// get the terminal started
 		startTerminal();
@@ -108,6 +115,11 @@ public class HourTrackerConsole implements TimeView  {
 		this.controller.setView(this);
 	}//end sole constructor
 
+	/**
+	 * Starts the terminal. and enters private mode,
+	 * effectively starting the application.
+	 * @return
+	 */
 	public boolean startTerminal() {
 		DefaultTerminalFactory defaultTerminalFactory =
 		new DefaultTerminalFactory();
@@ -125,6 +137,9 @@ public class HourTrackerConsole implements TimeView  {
 		return terminalStarted;
 	}//end startTerminal()
 
+	/**
+	 * Starts the main application loop
+	 */
 	public void startApplicationLoop(){
 		boolean continueLooping = true;
 		while(continueLooping){
@@ -132,8 +147,14 @@ public class HourTrackerConsole implements TimeView  {
 		}//end looping indefinetly
 	}//end startApplicationLoop()
 
+	/**
+	 * Stops teh terminal and exits private mode.
+	 * @return
+	 */
 	public boolean stopTerminal(){
 		try{
+			terminal.clearScreen();
+			terminal.exitPrivateMode();
 			terminal.close();
 			graphics = null;
 			terminal = null;
@@ -145,6 +166,11 @@ public class HourTrackerConsole implements TimeView  {
 		return terminalStarted;
 	}//end stopTerminal()
 
+	/**
+	 * Clears the line at the specified row.
+	 * @param rowNum
+	 * @return
+	 */
 	private boolean clearLine(int rowNum){
 		try {
 			int cols = terminal.getTerminalSize().getColumns();
@@ -228,15 +254,52 @@ public class HourTrackerConsole implements TimeView  {
 					menuChoice = showMenu(setMenu);
 				}//end if we need to reinterpret this state
 				// figure out what to do based on option
+				int numberOfMessages = -1;
 				switch(menuChoice){
 					case 0: // shown messages
-
+						do{
+							numberOfMessages = maxMessages;
+							String promptForNewNum = "Current number of "+
+							"messages shown is "+numberOfMessages+". It "+
+							"needs to be greater than 0. What do you "+
+							"want to set it to?";
+							numberOfMessages = getInt(promptForNewNum);
+						} while(numberOfMessages < 1);
+						// update setting
+						maxMessages = numberOfMessages;
+						// go ahead and move on to next menu
+						currentState = MenuState.SetMenu;
+						menuDecisionMatrix(-1);
 						break;
 					case 1: // shown groups
-
+						do{
+							numberOfMessages = maxGroups;
+							String promptForNewNum = "Current number of "+
+							"groups shown is "+numberOfMessages+". It "+
+							"needs to be greater than 0. What do you "+
+							"want to set it to?";
+							numberOfMessages = getInt(promptForNewNum);
+						} while(numberOfMessages < 1);
+						// update setting
+						maxGroups = numberOfMessages;
+						// go ahead and move on to next menu
+						currentState = MenuState.SetMenu;
+						menuDecisionMatrix(-1);
 						break;
-					case 2: // shown times
-
+						case 2: // shown times
+						do{
+							numberOfMessages = maxTimes;
+							String promptForNewNum = "Current number of "+
+							"times shown is "+numberOfMessages+". It "+
+							"needs to be greater than 0. What do you "+
+							"want to set it to?";
+							numberOfMessages = getInt(promptForNewNum);
+						} while(numberOfMessages < 1);
+						// update setting
+						maxTimes = numberOfMessages;
+						// go ahead and move on to next menu
+						currentState = MenuState.SetMenu;
+						menuDecisionMatrix(-1);
 						break;
 					case 3: // back
 						currentState = MenuState.MainMenu;
@@ -347,6 +410,34 @@ public class HourTrackerConsole implements TimeView  {
 				break;
 		}//end switching based on state
 	}//end menuDecisionMatrix(menuChoice)
+
+	/**
+	 * Gets an integer from the user.
+	 * @return Returns the integer given by the user.
+	 */
+	protected int getInt(String message){
+		int chosenInt = -1;
+		boolean gotResponse = false;
+		while(!gotResponse){
+			try{
+				clearLine(getInputRow());
+				graphics.putString(0, getInputRow(), message);
+				String response = getInput(getInputRow()+1, ":) ");
+				chosenInt = Integer.parseInt(response);
+				// if we got here, we didn't get caught
+				gotResponse = true;
+			} catch(IOException e){}
+			catch(NumberFormatException e){
+				clearLine(getInputRow());
+				graphics.putString(0, getInputRow(),
+				"That wasn't very integer of you...");
+				try{
+					Thread.sleep(3000);
+				} catch(InterruptedException e1){}
+			}//end catching NumberFormatExceptions
+		}//end looping while we don't have response yet
+		return chosenInt;
+	}//end getInt()
 
 	/**
 	 * The generic method for displaying a menu of string options,
@@ -576,9 +667,8 @@ public class HourTrackerConsole implements TimeView  {
 	protected List<String> buildMessages(){
 		List<String> messages = new ArrayList<String>();
 		int messageCount = 0;
-		int messageLimit = 5;
 		for(int i = messages.size() - 1;
-		messageCount < messageLimit && i >= 0; i--){
+		messageCount < maxMessages && i >= 0; i--){
 			messages.add(savedMessages.get(i) + "\n");
 			messageCount++;
 		}//end looping over messages
@@ -604,11 +694,10 @@ public class HourTrackerConsole implements TimeView  {
 	protected List<String> buildGroups(){
 		List<String> groups = new ArrayList<String>();
 		int groupCount = 0;
-		int groupLimit = 4;
 		List<TimeGrouping> timeGroupings = controller.getGroups();
 		StringBuilder sb = new StringBuilder();
 		for(int i = timeGroupings.size() - 1;
-		groupCount < groupLimit && i >= 0; i--){
+		groupCount < maxGroups && i >= 0; i--){
 			sb.append(timeGroupings.get(i).getName());
 			sb.append(" | ");
 			sb.append(timeGroupings.get(i).getTimeCount());
@@ -642,13 +731,12 @@ public class HourTrackerConsole implements TimeView  {
 		List<String> lines = new ArrayList<String>();
 		List<TimeGrouping> timeGroupings = controller.getGroups();
 		int timeCount = 0;
-		int timeLimit = 6;
 		StringBuilder sb = new StringBuilder();
 		for(int i = timeGroupings.size() - 1;
-		timeCount < timeLimit && i >= 0; i--){
+		timeCount < maxTimes && i >= 0; i--){
 			List<TimedInstance> times = timeGroupings.get(i).getTimes();
 			for(int j = times.size() - 1;
-			timeCount < timeLimit && j >= 0; j--){
+			timeCount < maxTimes && j >= 0; j--){
 				TimedInstance time = times.get(j);
 				sb.append(time.getName());
 				sb.append(" | ");
