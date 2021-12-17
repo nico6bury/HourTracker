@@ -100,11 +100,11 @@ public class TimeGroupManager {
      * time into.
      */
     public boolean addTime(TimedInstance time, String groupName){
-    boolean foundExistingGroup = false;
+        boolean foundExistingGroup = false;
         int foundGroupIndex = -1;
 
         for(int i = 0; i < groups.size(); i++){
-            if(groupName == groups.get(i).getName()){
+            if(groupName.equals(groups.get(i).getName())){
                 foundExistingGroup = true;
                 foundGroupIndex = i;
                 break;
