@@ -992,7 +992,10 @@ public class HourTrackerConsole implements TimeView  {
 					confirmation = false;
 				}//end if response was no
 				else{
-					// TODO: Write error message
+					clearLine(getInputRow());
+					graphics.putString(0,getInputRow(),"Unrecognized "+
+					"input, please only write yes or no, y or n, etc.");
+					try{Thread.sleep(3000);}catch(InterruptedException e){}
 					response = "";
 				}//end else response invalid
 			}//end trying to get input
