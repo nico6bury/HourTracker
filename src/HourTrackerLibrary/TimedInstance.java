@@ -340,8 +340,8 @@ public class TimedInstance {
                         .getField(componentComponents[0]);
                     if(componentField.canAccess(this)){
                         // figure out the type and convert it accordingly
-                        if(componentField.getType() == Instant.class){
-                            Instant value = Instant
+                        if(componentField.getType() == LocalDateTime.class){
+                            LocalDateTime value = LocalDateTime
                                 .parse(componentComponents[1]);
                             componentField.set(this, value);
                         }//end if we're working with an instant
