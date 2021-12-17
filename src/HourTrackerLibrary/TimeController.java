@@ -34,6 +34,20 @@ public class TimeController {
 	public TimeGrouping getGroup(int index){
 		return groupManager.getGroups().get(index);
 	}//end getGroup(index)
+	/**
+	 * Gets the group with the specified name.
+	 * @param groupName The name of the group you want to get.
+	 * @return Returns the TimeGrouping object if it is found,
+	 * or null if it isn't found.
+	 */
+	public TimeGrouping getGroup(String groupName){
+		for(TimeGrouping group : groupManager.getGroups()){
+			if(group.getName().equals(groupName)){
+				return group;
+			}//end if we found the group
+		}//end looking through groups for specific group
+		return null;
+	}//end getGroup(groupName)
 	public boolean containsGroup(String groupName){
 		for(TimeGrouping group : groupManager.getGroups()){
 			if(group.getName().equals(groupName)){
