@@ -74,10 +74,10 @@ public class TimedInstance {
      */
     public Duration getDuration(){
         if(handleSpecificBeginEnd){
-            return duration;
+            return Duration.between(start, end);
         }//end if we're handling specific start or end
         else{
-            return Duration.between(start, end);
+            return duration;
         }//end else we're not handling specific start or end
     }//end getDuration()
     /**
