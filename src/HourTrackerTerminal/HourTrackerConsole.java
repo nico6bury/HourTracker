@@ -143,6 +143,7 @@ public class HourTrackerConsole implements TimeView  {
 	public void startApplicationLoop(){
 		boolean continueLooping = true;
 		while(continueLooping){
+			currentState = MenuState.MainMenu;
 			menuDecisionMatrix(-1);
 		}//end looping indefinetly
 	}//end startApplicationLoop()
@@ -303,7 +304,8 @@ public class HourTrackerConsole implements TimeView  {
 						break;
 					case 3: // back
 						currentState = MenuState.MainMenu;
-						menuDecisionMatrix(-1);
+						// do nothing to cancel out recursion
+						//menuDecisionMatrix(-1);
 						break;
 				}//end switching based on menu choice
 				break;
@@ -327,7 +329,8 @@ public class HourTrackerConsole implements TimeView  {
 						break;
 					case 3: // back
 						currentState = MenuState.MainMenu;
-						menuDecisionMatrix(-1);
+						// do nothing to cancel out recursion
+						//menuDecisionMatrix(-1);
 						break;
 				}//end switching based on menu choice
 				break;
@@ -348,7 +351,8 @@ public class HourTrackerConsole implements TimeView  {
 						break;
 					case 2: // back
 						currentState = MenuState.MainMenu;
-						menuDecisionMatrix(-1);
+						// do nothing to cancel out recursion
+						//menuDecisionMatrix(-1);
 						break;
 				}//end switching based on menu choice
 				break;
@@ -362,14 +366,43 @@ public class HourTrackerConsole implements TimeView  {
 				// figure out what to do based on option
 				switch(menuChoice){
 					case 0: // remove time
-
+						if(controller.getTimes().size() < 1){
+							displayMessage("There are no times " +
+							"to remove.");
+						}//end if there are no times
+						else{
+							String[] groups = new String[controller.getGroups().size()];
+							for(int i = 0; i < groups.length; i++){
+								groups[i] = controller.getGroup(i).getName();
+							}//end adding group names to groups
+							int groupIndex = showMenu(groups);
+							TimeGrouping group = controller.getGroup(groupIndex);
+							String[] times = new String[group.getTimeCount()];
+							for(int i = 0; i < times.length; i++){
+								times[i] = group.getTime(i).toString();
+							}//end adding timed instances to times
+							int timeIndex = showMenu(times);
+							controller.removeTime(groupIndex, timeIndex);
+						}//end else there are times
 						break;
 					case 1: // remove group
-
+						if(controller.getGroups().size() < 1){
+							displayMessage("There are no groups "+
+							"to remove.");
+						}//end if there are no groups
+						else{
+							String[] groups = new String[controller.getGroups().size()];
+							for(int i = 0; i < groups.length; i++){
+								groups[i] = controller.getGroup(i).getName();
+							}//end adding group names to groups
+							int groupIndex = showMenu(groups);
+							controller.removeGroup(groupIndex);
+						}//end else there is at least one group
 						break;
 					case 2: // back
 						currentState = MenuState.MainMenu;
-						menuDecisionMatrix(-1);
+						// do nothing to cancel out recursion
+						//menuDecisionMatrix(-1);
 						break;
 				}//end switching based on menu choice
 				break;
@@ -402,7 +435,8 @@ public class HourTrackerConsole implements TimeView  {
 						break;
 					case 6: // back
 						currentState = MenuState.MainMenu;
-						menuDecisionMatrix(-1);
+						// do nothing to cancel out recursion
+						//menuDecisionMatrix(-1);
 						break;
 				}//end switching based on menu choice
 				break;
