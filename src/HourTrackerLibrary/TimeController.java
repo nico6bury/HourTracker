@@ -59,6 +59,9 @@ public class TimeController {
 	public boolean containsGroup(TimeGrouping group){
 		return groupManager.getGroups().contains(group);
 	}//end containsGroup(group)
+	public int getGroupCount(){
+		return groupManager.getGroups().size();
+	}//end getGrooupCount()
 	public List<TimedInstance> getTimes(){
 		List<TimedInstance> outputTimes = new ArrayList<TimedInstance>();
 		for(TimedInstance time : groupManager.getTimes()){
@@ -260,6 +263,14 @@ public class TimeController {
 		groupManager.addGroup(newGroup);
 		view.refreshView();
 	}//end addGroup()
+
+	/**
+	 * Just adds a group without poking the view.
+	 * @param groupName The name of the group to be added.
+	 */
+	public void addGroup(String groupName){
+		groupManager.addGroup(new TimeGrouping(groupName));
+	}//end addGroup(groupName)
 
 	/**
 	 * Removes a specific time.
