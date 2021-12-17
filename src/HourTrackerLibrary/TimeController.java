@@ -34,6 +34,17 @@ public class TimeController {
 	public TimeGrouping getGroup(int index){
 		return groupManager.getGroups().get(index);
 	}//end getGroup(index)
+	public boolean containsGroup(String groupName){
+		for(TimeGrouping group : groupManager.getGroups()){
+			if(group.getName().equals(groupName)){
+				return true;
+			}//end if we found the right group
+		}//end looking through groups for specified name
+		return false;
+	}//end containsGroup(groupName)
+	public boolean containsGroup(TimeGrouping group){
+		return groupManager.getGroups().contains(group);
+	}//end containsGroup(group)
 	public List<TimedInstance> getTimes(){
 		List<TimedInstance> outputTimes = new ArrayList<TimedInstance>();
 		for(TimedInstance time : groupManager.getTimes()){
