@@ -1,6 +1,7 @@
 package HourTrackerLibrary;
 
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.lang.reflect.*;
 
 /**
@@ -11,12 +12,12 @@ public class TimedInstance {
     /**
      * The start time for this instance.
      */
-    protected Instant start = Instant.now();
+    protected LocalDateTime start = LocalDateTime.now();
     /**
      * 
      * @return
      */
-    public Instant getStart() {
+    public LocalDateTime getStart() {
         if(handleSpecificBeginEnd){
             return start;
         }//end if we're handling specific start or end times
@@ -28,19 +29,19 @@ public class TimedInstance {
      * 
      * @param start
      */
-    public void setStart(Instant start){
+    public void setStart(LocalDateTime start){
         this.start = start;
     }//end setStart(instant)
 
     /**
      * The end time for this instance.
      */
-    protected Instant end = Instant.now();
+    protected LocalDateTime end = LocalDateTime.now();
     /**
      * 
      * @return
      */
-    public Instant getEnd(){
+    public LocalDateTime getEnd(){
         if(handleSpecificBeginEnd){
             return end;
         }//end if we're handling specific start or end
@@ -52,9 +53,16 @@ public class TimedInstance {
      * 
      * @param end
      */
-    public void setEnd(Instant end){
+    public void setEnd(LocalDateTime end){
         this.end = end;
     }//end setEnd(end)
+
+    private DateTimeFormatter timeFormat =
+    DateTimeFormatter.ofPattern("hh:mm:ss a");
+    private DateTimeFormatter dateFormat =
+    DateTimeFormatter.ofPattern("uu/MM/d");
+    private DateTimeFormatter dateTimeFormat =
+    DateTimeFormatter.ofPattern("uu/MM/d hh:mm:ss a");
 
     /**
      * The duration of this instance.
@@ -181,7 +189,7 @@ public class TimedInstance {
      * @param start The starting time for this instance.
      * @param end The ending time for this instance.
      */
-    public TimedInstance(Instant start, Instant end){
+    public TimedInstance(LocalDateTime start, LocalDateTime end){
         this.start = start;
         this.end = end;
         handleSpecificBeginEnd = true;
@@ -197,7 +205,7 @@ public class TimedInstance {
      * for this duration.
      */
     public TimedInstance(int hours, int minutes){
-        this.end = Instant.now();
+        this.end = LocalDateTime.now();
         this.duration = Duration.ofMinutes(minutes +
         (hours * 60));
         this.start = this.end.minus(this.duration);
@@ -214,7 +222,7 @@ public class TimedInstance {
      */
     public TimedInstance(Duration duration){
         this.duration = duration;
-        this.end = Instant.now();
+        this.end = LocalDateTime.now();
         this.start = this.end.minus(duration);
         handleSpecificBeginEnd = false;
         handleDate = false;
@@ -268,13 +276,25 @@ public class TimedInstance {
         StringBuilder sb = new StringBuilder();
         if(handleSpecificBeginEnd){
             if(handleDate){
-                sb.append(start + " to " + end);
+                sb.append(start.format(dateTimeFormat) + " to "
+                + end.format(dateTimeFormat));
             }//end if we should print the date
             else{
-                sb.append(start + " to " + end);
+                sb.append(start.format(timeFormat) + " to " +
+                end.format(timeFormat));
             }//end else we shouldn't print the date
         }//end if we're handling specific start or end
         else{
+            if(handleDate){
+                String date1 = start.format(dateFormat);
+                String date2 = end.format(dateFormat);
+                if(date1.equals(date2)){
+                    sb.append(date1 + " ");
+                }//end if they're the same
+                else{
+                    sb.append(date1 + " - " + date2 + " ");
+                }//end else they're different, need span
+            }//end if we're handling date
             Duration localDuration = getDuration();
             long hours = localDuration.getSeconds() / 360;
             long minutes = localDuration.getSeconds() / 60;

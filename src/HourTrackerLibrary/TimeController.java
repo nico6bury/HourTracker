@@ -8,7 +8,7 @@ import java.lang.Math;
  * 
  */
 public class TimeController {
-	private Instant clockInTime = Instant.now();
+	private LocalDateTime clockInTime = LocalDateTime.now();
 	private boolean currentlyClocked = false;
 	public boolean getCurrentlyClocked(){
 		return currentlyClocked;
@@ -170,14 +170,14 @@ public class TimeController {
 	 * Method that should be called when the user clocks in.
 	 */
 	public void clockIn(){
-		clockInTime = Instant.now();
+		clockInTime = LocalDateTime.now();
 		this.currentlyClocked = true;
 		startClock();
 	}//end clockIn()
 
 	public void clockOut(){
 		// save the new time
-		Instant clockOutTime = Instant.now();
+		LocalDateTime clockOutTime = LocalDateTime.now();
 		TimedInstance time = new TimedInstance(clockInTime, clockOutTime);
 		// get name for that time
 		time.name = view.getCurrentInstanceName();
@@ -198,7 +198,7 @@ public class TimeController {
 	 * the instance allegedly took place in favor of just using raw time
 	 * of day.
 	 */
-	public void addPreviousTime(Instant start, Instant end,
+	public void addPreviousTime(LocalDateTime start, LocalDateTime end,
 	boolean handleDate){
 		TimedInstance prevTime = new TimedInstance(start, end);
 		prevTime.setHandleSpecificBeginEnd(true);
