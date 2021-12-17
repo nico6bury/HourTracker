@@ -2,7 +2,10 @@ package HourTrackerTerminal;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -62,6 +65,12 @@ public class HourTrackerConsole implements TimeView  {
 	String[] removeMenu = {"Remove Time", "Remove Group", "Back"};
 	String[] pageMenu = {"Messages Up", "Messages Down", "Groups Up",
 		"Groups Down", "Times Up", "Times Down", "Back"};
+	DateTimeFormatter clockFormat = DateTimeFormatter.ofPattern("h:mm:ss a");
+	private String formatDuration(Duration d){
+		return String.format("%d:%02d:%02d",d.toHours(),
+		d.toMinutesPart(),d.toSecondsPart());
+	}//end formatDuration(d)
+	DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("uu/MM/d EEE");
 	/**
 	 * The controller for this class. Holds all our data too.
 	 */
@@ -735,12 +744,11 @@ public class HourTrackerConsole implements TimeView  {
 		StringBuilder sb = new StringBuilder();
 		for(int i = timeGroupings.size() - 1;
 		groupCount < maxGroups && i >= 0; i--){
-			// TODO: Implement better string formatting
 			sb.append(timeGroupings.get(i).getName());
 			sb.append(" | ");
 			sb.append(timeGroupings.get(i).getTimeCount());
 			sb.append(" Times | ");
-			sb.append(timeGroupings.get(i).getTotalTime());
+			sb.append(formatDuration(timeGroupings.get(i).getTotalTime()));
 			sb.append("\n");
 			groups.add(sb.toString());
 			sb.setLength(0);
@@ -775,23 +783,29 @@ public class HourTrackerConsole implements TimeView  {
 			List<TimedInstance> times = timeGroupings.get(i).getTimes();
 			for(int j = times.size() - 1;
 			timeCount < maxTimes && j >= 0; j--){
-				// TODO: Implement better string formatting
 				TimedInstance time = times.get(j);
 				sb.append(time.getName());
 				sb.append(" | ");
 				// add start and end time
 				if(time.getHandleSpecificBeginEnd()){
-					sb.append(time.getStart());
+					sb.append(clockFormat.format(time.getStart()));
 					sb.append(" - ");
-					sb.append(time.getEnd());
+					sb.append(clockFormat.format(time.getEnd()));
 					sb.append(" | ");
 				}//end if we should have specific start and end
 				// add duration
-				sb.append(time.getDuration());
+				sb.append(formatDuration(time.getDuration()));
 				// add date
 				if(time.getHandleDate()){
 					sb.append(" | ");
-					sb.append("Date");
+					String date1 = time.getStart().format(dateFormat);
+					String date2 = time.getEnd().format(dateFormat);
+					if(date1.equals(date2)){
+						sb.append(date1);
+					}//end if dates are equal
+					else{
+						sb.append(date1 + " - " + date2);
+					}//end else we should show date span
 				}//end if we should include date
 				lines.add(sb.toString());
 				sb.setLength(0);
@@ -838,10 +852,10 @@ public class HourTrackerConsole implements TimeView  {
 			terminal.setCursorVisible(false);
 			// build array of values to display
 			String[] timeInfo = new String[3];
-			// TODO: Implement better string formatting
-			timeInfo[0] = Instant.now().toString();
-			timeInfo[1] = controller.getClockedTime().toString();
-			timeInfo[2] = controller.getProjectedGroupTotalTime().toString();
+			timeInfo[0] = LocalTime.now().format(this.clockFormat);
+			timeInfo[1] = formatDuration(controller.getClockedTime());
+			timeInfo[2] = formatDuration(controller
+			.getProjectedGroupTotalTime());
 			// actually display the update
 			this.updateCurrentTime(timeInfo);
 			terminal.setCursorVisible(true);
