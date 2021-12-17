@@ -168,7 +168,7 @@ public class ConsoleTimeView implements TimeView {
      */
     @Override
     public void refreshView() {
-        String[] times = {"Time 1", "Time 2", "Time 3"};
+        //String[] times = {"Time 1", "Time 2", "Time 3"};
         // terminal.updateCurrentTime(times);
         // System.out.println(ConsoleStatics
         // .displayNormalInfo(controller, messages));
