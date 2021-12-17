@@ -31,6 +31,16 @@ public class TimeController {
 		}//end adding groops in groupManager to outputGroups
 		return outputGroups;
 	}//end getGroups()
+	public TimeGrouping getGroup(int index){
+		return groupManager.getGroups().get(index);
+	}//end getGroup(index)
+	public List<TimedInstance> getTimes(){
+		List<TimedInstance> outputTimes = new ArrayList<TimedInstance>();
+		for(TimedInstance time : groupManager.getTimes()){
+			outputTimes.add(time);
+		}//end adding all the times to outputTimes
+		return outputTimes;
+	}//end getTimes()
 	public TimeView view;
 	
 	/**

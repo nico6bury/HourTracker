@@ -27,7 +27,15 @@ public class TimeGrouping {
     public void setTimes(List<TimedInstance> times){
         this.times = times;
     }//end setTimes(times)
-    
+    /**
+     * 
+     * @param index
+     * @return
+     */
+    public TimedInstance getTime(int index){
+        return times.get(index);
+    }//end getTime(index)
+
     /**
      * The name of this group.
      */
