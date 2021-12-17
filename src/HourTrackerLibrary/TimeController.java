@@ -126,6 +126,8 @@ public class TimeController {
 		timeTask.cancel();
 		clock.cancel();
 		clock.purge();
+		timeTask = new UpdateTimeTask(view);
+		clock = new Timer();
 	}//end stopClock()
 
 	/**
