@@ -5,7 +5,9 @@ import java.lang.reflect.Field;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.graphics.TextGraphics;
@@ -303,7 +305,7 @@ public class HourTrackerConsole implements TimeView  {
 						menuDecisionMatrix(-1);
 						break;
 					case 3: // back
-						currentState = MenuState.MainMenu;
+						//currentState = MenuState.MainMenu;
 						// do nothing to cancel out recursion
 						//menuDecisionMatrix(-1);
 						break;
@@ -322,13 +324,13 @@ public class HourTrackerConsole implements TimeView  {
 
 						break;
 					case 1: // add group
-						
+						controller.addGroup();
 						break;
 					case 2: // import old files from...
 
 						break;
 					case 3: // back
-						currentState = MenuState.MainMenu;
+						//currentState = MenuState.MainMenu;
 						// do nothing to cancel out recursion
 						//menuDecisionMatrix(-1);
 						break;
@@ -350,7 +352,7 @@ public class HourTrackerConsole implements TimeView  {
 
 						break;
 					case 2: // back
-						currentState = MenuState.MainMenu;
+						//currentState = MenuState.MainMenu;
 						// do nothing to cancel out recursion
 						//menuDecisionMatrix(-1);
 						break;
@@ -400,7 +402,7 @@ public class HourTrackerConsole implements TimeView  {
 						}//end else there is at least one group
 						break;
 					case 2: // back
-						currentState = MenuState.MainMenu;
+						//currentState = MenuState.MainMenu;
 						// do nothing to cancel out recursion
 						//menuDecisionMatrix(-1);
 						break;
@@ -434,7 +436,7 @@ public class HourTrackerConsole implements TimeView  {
 
 						break;
 					case 6: // back
-						currentState = MenuState.MainMenu;
+						//currentState = MenuState.MainMenu;
 						// do nothing to cancel out recursion
 						//menuDecisionMatrix(-1);
 						break;
@@ -846,42 +848,31 @@ public class HourTrackerConsole implements TimeView  {
 	
 	@Override
 	public String getSelectedGroupName() {
-		// TODO Have some sort of handling for more than 26 groups.
-		List<TimeGrouping> groups = controller.getGroups();
-		String[] groupMenu = new String[groups.size()];
-		for(int i = 0; i < groupMenu.length; i++){
-			groupMenu[i] = groups.get(i).getName();
-		}//end adding group names to groupMenu
-		if(groupMenu.length == 0){
-			groupMenu = new String[1];
-			groupMenu[0] = "Ungrouped";
-		}//end if menu is empty
-		else if(!Arrays.asList(groupMenu).contains("Ungrouped")){
-			// add Ungrouped group to the array
-			String[] temp = new String[groupMenu.length];
-			for(int i = 0; i < groupMenu.length; i++){
-				temp[i] = groupMenu[i];
-			}//end adding all the options back to the menu
-			temp[temp.length - 1] = "Ungrouped";
-			groupMenu = temp;
-		}//end if menu doesn't contain Ungrouped
-		// clear previous input
-		try {
-			terminal.clearScreen();
-		} catch (IOException e) {}
-		// display regular info
-		displayInfo();
-		// display options
-		displayOptions(groupMenu);
-		// get option from user
-		int choiceIndex = getOption(groupMenu);
-		if(choiceIndex > -1 && choiceIndex < groupMenu.length){
-			return groupMenu[choiceIndex];
-		}//end if we have a valid choice found
-		else{
-			// return default-ish valud
-			return "Ungrouped";
-		}//end else we don't have a valid choice
+		String groupName = "";
+		clearLine(getInputRow());
+		String promptForGroupName = "Please enter the name of a group.";
+		Set<String> groupNames = new HashSet<String>();
+		for(TimeGrouping group : controller.getGroups()){
+			groupNames.add(group.getName());
+		}//end adding names to groupNames
+		while(groupName.equals("")){
+			graphics.putString(0, getInputRow(), promptForGroupName);
+			try {
+				groupName = getInput(getInputRow()+1,":) ");
+			} catch (IOException e) {}
+			if(!groupNames.contains(groupName)){
+				String promptForGroupCreation = "You are about to make "+
+				"a new group called "+groupName+". Is that okay?";
+				boolean createGroup =
+				confirmationMessage(promptForGroupCreation);
+				clearLine(getInputRow());
+				if(!createGroup){
+					groupName = "";
+				}//end if we want to prevent making a group
+			}//end if making new group
+		}//end looping while we still need a groupName
+		
+		return groupName;
 	}//end getSelectedGroupName()
 	
 	/**
