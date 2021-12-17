@@ -137,10 +137,10 @@ public class TimeController {
 	 */
 	public Duration getClockedTime(){
 		if(currentlyClocked){
-			return Duration.between(clockInTime, Instant.now());
+			return Duration.between(clockInTime, LocalDateTime.now());
 		}//end if currently clocked in
 		else{
-			return Duration.ofNanos(0);
+			return Duration.ZERO;
 		}//end else not clocked in
 	}//end getClockedTime()
 
