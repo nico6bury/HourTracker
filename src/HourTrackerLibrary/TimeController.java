@@ -226,6 +226,17 @@ public class TimeController {
 	}//end addPreviousTime(duration, handleDate)
 
 	/**
+	 * When called, instructs the view to get information from
+	 * the user in order to create a new group.
+	 */
+	public void addGroup(){
+		String groupName = view.getSelectedGroupName();
+		TimeGrouping newGroup = new TimeGrouping(groupName);
+		groupManager.addGroup(newGroup);
+		view.refreshView();
+	}//end addGroup()
+
+	/**
 	 * Removes a specific time.
 	 * @param groupIndex The index of the group which holds the instance
 	 * to be removed.
