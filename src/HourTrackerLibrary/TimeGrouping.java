@@ -26,6 +26,9 @@ public class TimeGrouping {
      */
     public void setTimes(List<TimedInstance> times){
         this.times = times;
+        for(TimedInstance time : this.times){
+            time.setCurrentGroup(this);
+        }//end making sure all the times have right group
     }//end setTimes(times)
     /**
      * 
@@ -191,6 +194,7 @@ public class TimeGrouping {
         this.name = lines.get(0);
         for(int i = 1; i < lines.size(); i++){
             TimedInstance newTime = new TimedInstance(lines.get(i));
+            newTime.setCurrentGroup(this);
             this.times.add(newTime);
         }//end looping over lines
     }//end deserialize(lines)
