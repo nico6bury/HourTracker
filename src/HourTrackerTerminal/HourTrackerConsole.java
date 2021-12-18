@@ -38,6 +38,9 @@ public class HourTrackerConsole implements TimeView  {
 	int maxMessages = 4;
 	int maxGroups = 4;
 	int maxTimes = 4;
+	int messageOffset = 0;
+	int groupOffset = 0;
+	int timesOffset = 0;
 	/**
 	 * The index in the controller's group list
 	 * of the group we consider active. No active
@@ -450,27 +453,42 @@ public class HourTrackerConsole implements TimeView  {
 				// figure out what to do based on option
 				switch(menuChoice){
 					case 0: // messages up
-					// TODO: implement feature
+						if(messageOffset < maxMessages){
+							messageOffset++;
+						}//end if offset less than max
+						menuDecisionMatrix(-1);
 						break;
 					case 1: // messages down
-					// TODO: implement feature
+						if(messageOffset > 0){
+							messageOffset--;
+						}//end if offset greater than 0
+						menuDecisionMatrix(-1);
 						break;
 					case 2: // groups up
-					// TODO: implement feature
+						if(groupOffset < maxGroups){
+							groupOffset++;
+						}//end if offset less than max
+						menuDecisionMatrix(-1);
 						break;
 					case 3: // groups down
-					// TODO: implement feature
+						if(groupOffset > 0){
+							groupOffset--;
+						}//end if offset greater than 0
+						menuDecisionMatrix(-1);
 						break;
 					case 4: // times up
-					// TODO: implement feature
+						if(timesOffset < maxTimes){
+							timesOffset++;
+						}//end if offset less than max
+						menuDecisionMatrix(-1);
 						break;
 					case 5: // times down
-					// TODO: implement feature
+						if(timesOffset > 0){
+							timesOffset--;
+						}//end if offset greater than 0
+						menuDecisionMatrix(-1);
 						break;
-					case 6: // back
-						//currentState = MenuState.MainMenu;
-						// do nothing to cancel out recursion
-						//menuDecisionMatrix(-1);
+					default:
 						break;
 				}//end switching based on menu choice
 				break;
@@ -745,7 +763,7 @@ public class HourTrackerConsole implements TimeView  {
 	protected List<String> buildMessages(){
 		List<String> messages = new ArrayList<String>();
 		int messageCount = 0;
-		for(int i = savedMessages.size() - 1;
+		for(int i = savedMessages.size() - 1 - messageOffset;
 		messageCount < maxMessages && i >= 0; i--){
 			messages.add(savedMessages.get(i) + "\n");
 			messageCount++;
@@ -774,7 +792,7 @@ public class HourTrackerConsole implements TimeView  {
 		int groupCount = 0;
 		List<TimeGrouping> timeGroupings = controller.getGroups();
 		StringBuilder sb = new StringBuilder();
-		for(int i = timeGroupings.size() - 1;
+		for(int i = timeGroupings.size() - 1 - groupOffset;
 		groupCount < maxGroups && i >= 0; i--){
 			sb.append(timeGroupings.get(i).getName());
 			sb.append(" | ");
@@ -810,10 +828,11 @@ public class HourTrackerConsole implements TimeView  {
 		List<TimeGrouping> timeGroupings = controller.getGroups();
 		int timeCount = 0;
 		StringBuilder sb = new StringBuilder();
+		int tempOffset = timesOffset;
 		for(int i = timeGroupings.size() - 1;
 		timeCount < maxTimes && i >= 0; i--){
 			List<TimedInstance> times = timeGroupings.get(i).getTimes();
-			for(int j = times.size() - 1;
+			for(int j = times.size() - 1 - tempOffset;
 			timeCount < maxTimes && j >= 0; j--){
 				TimedInstance time = times.get(j);
 				sb.append(time.getName());
@@ -839,10 +858,13 @@ public class HourTrackerConsole implements TimeView  {
 						sb.append(date1 + " - " + date2);
 					}//end else we should show date span
 				}//end if we should include date
+				sb.append(" | " + time.getCurrentGroupName());
 				lines.add(sb.toString());
 				sb.setLength(0);
 				timeCount++;
 			}//end looping over times in group
+			tempOffset -= times.size();
+			if(tempOffset < 0) tempOffset = 0;
 		}//end looping over groups
 		if(timeCount == 0){
 			lines.add("No Timed Instances Yet\n");
